@@ -1,0 +1,40 @@
+/**
+ * 前端样式重置
+ */
+
+body,ul,li,p,h1,h2,h3,h4,h5,h6,img,br,hr,table,tr,td,dl,dt,dd,form {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Arial,"微软雅黑";
+	font-size: 30px;
+}
+.clear {
+	clear: both;
+	font-size: 0px;
+}
+ul,li {
+	list-style: none;
+}
+img {
+	border: none;
+}
+
+/**单行文本**/
+
+.line1 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/**两行文本**/
+
+.line2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-all;
+}
