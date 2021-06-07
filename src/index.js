@@ -15,7 +15,6 @@ window.log = (params) => {
 export default class App extends React.Component {
     constructor(props) {
         super(props)
-        console.log('begin')
     }
     render() {
         return (

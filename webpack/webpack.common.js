@@ -1,4 +1,4 @@
-const Path = require('path')
+const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HappyPack = require('happypack')
 const webpack = require('webpack')
@@ -9,12 +9,12 @@ module.exports = {
 
     // webpack 编译入口
     entry: {
-        index: Path.join(__dirname, '../src/index.js'),
+        index: path.join(__dirname, '../src/index.js'),
         // vendor: ['react']
     },
     // webpack 编译出口
     output: {
-        path: Path.join(__dirname, '../dist'),
+        path: path.join(__dirname, '../dist'),
         filename: '[name][id].js',
         publicPath: '/'
     },
@@ -24,7 +24,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 include: [
-                    Path.join(__dirname, '../src')
+                    path.join(__dirname, '../src')
                 ],
                 use: ['happypack/loader?id=babel'],
             },
@@ -35,6 +35,11 @@ module.exports = {
                 ]
             },
         ]
+    },
+    resolve: {
+        alias: {
+            '@': path.join(__dirname, '../src')
+        }
     },
     // resolve: {
     //     alias: {

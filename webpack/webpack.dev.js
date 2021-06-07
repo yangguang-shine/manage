@@ -1,4 +1,4 @@
-const Path = require('path')
+const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CommonConfig = require('./webpack.common.js')
 const { merge } = require('webpack-merge')
@@ -7,9 +7,19 @@ const webpack = require('webpack')
 const developmentConfig = merge(CommonConfig, {
     // 启用 webpack 本地服务
     devServer: {
-        contentBase: Path.join(__dirname, '/dist'),
+        port: 7777, // 自定义修改8888端口
+        contentBase: path.join(__dirname, '/dist'),
         hot: true,
-        historyApiFallback: true
+        historyApiFallback: true,
+        open: false,
+        host: "dev.jr.jd.com",
+        // 代理跨域
+        proxy: {
+            "/api": {
+                "target": "http://dev.jr.jd.com:9999",
+                "changeOrigin": true
+            }
+        }
     },
     // 使用开发模式
     mode: 'development',

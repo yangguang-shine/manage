@@ -2,7 +2,7 @@ const { merge } = require('webpack-merge')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CommonConfig = require('./webpack.common.js')
-const Path = require('path')
+const path = require('path')
 const PurifyCssWebpack = require('purifycss-webpack') // 引入PurifyCssWebpack插件
 const glob = require('glob') // 引入glob模块,用于扫描全部html文件中所引用的css
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin") // 压缩css代码
@@ -59,7 +59,7 @@ const productionConfig = merge(CommonConfig, {
     // webpack 生产模式插件
     plugins: [
         // new CleanWebpackPlugin({
-        //     cleanOnceBeforeBuildPatterns: [`${Path.join(__dirname, '../dist')}`]
+        //     cleanOnceBeforeBuildPatterns: [`${path.join(__dirname, '../dist')}`]
         // })
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
@@ -80,7 +80,7 @@ const productionConfig = merge(CommonConfig, {
             },
         }),
         new PurifyCssWebpack({
-            paths: glob.sync(Path.join(__dirname, '../public/*.html')),
+            paths: glob.sync(path.join(__dirname, '../public/*.html')),
         }),
         // new CompressionPlugin({
         //     // gzip压缩配置
