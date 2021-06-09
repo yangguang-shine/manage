@@ -1,8 +1,10 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { Table, Tag, Popconfirm, Modal } from 'antd';
+import { Table, Tag, Popconfirm, Modal, Button, Spin } from 'antd';
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom'
 import ShopEdit from './shopEdit';
 import request from '@/utils/request';
+import { delaySync } from '@/utils/index';
 import './index.less'
 
 const Shop = (props) => {
@@ -10,26 +12,21 @@ const Shop = (props) => {
     const [dataSource, setDatasource] = useState([])
     const [record, setRecord] = useState({})
     const [editShopModal, setEditShopModal] = useState(false)
-
+    const [spinning, setSpinning] = useState(false)
     let key = 0;
-    const getShopList = async () => {
-        try {
-            // const res = await request.get('/user/shop/list')
-            const res = [
-                {"shopName":"汉堡","startTime":"07:00","endTime":"20:00","address":"西直门凯德茂地铁站","description":"嘻嘻嘻","businessTypes":"[3]","minus":"[{\"reach\":14,\"minus\":1},{\"reach\":24,\"minus\":2}]"},
-                {"shopName":"汉堡","startTime":"07:00","endTime":"20:00","address":"西直门凯德茂地铁站","description":"嘻嘻嘻","businessTypes":"[3]","minus":"[{\"reach\":14,\"minus\":1},{\"reach\":24,\"minus\":2}]"}
-            ]
-            const newDataSource = formatDataSource(res)
-            console.log(newDataSource[0])
-            setDatasource(newDataSource)
-            // setRecord(newDataSource[0])
-            // setEditShopModal(true)
-            
-        } catch (error) {
-            console.log(error)
-        }
+    async function getShopList (){
+        await delaySync()
+        const res = await request.get('/manage/shop/list')
+        const newDataSource = formatDataSource(res)
+        setDatasource(newDataSource)
     }
-    const formatDataSource = (list = []) => {
+    async function removeShop(shopID) {
+        await delaySync()
+        await request.post('/manage/shop/remove', {
+            shopID
+        });
+    }
+    function formatDataSource (list = []) {
         return list.map((item) => {
             key++;
             const shopID = item.shopID
@@ -40,9 +37,33 @@ const Shop = (props) => {
             const openTiming = `${item.startTime}-${item.endTime}`
             const minus = item.minus
             const minusList = JSON.parse(item.minus)
+            const minusInfo = minusList.reduce((str, item) => {
+                const reach = item.reach
+                const minus = item.minus
+                return str ? `${str},满${reach}减${minus}` : `满${reach}减${minus}`
+            }, '')
             const address = item.address
+            const latitude = item.latitude
+            const longitude = item.longitude
+            const location = item.location
+            const positionInfo = `${latitude},${longitude}`
             const description = item.description
             const businessTypes = item.businessTypes
+            const businessTypesList = JSON.parse(item.businessTypes)
+            const businessTypesInfo = businessTypesList.reduce((str, item) => {
+                let type = ''
+                if (+item === 2) {
+                    type = '外卖'
+
+                } else if (+item === 3) {
+                    type = '堂食'
+                }
+                if (type) {
+                    return str ? `${str},${type}` : `${type}`
+                } else {
+                    return str
+                }
+            }, '')
             return {
                 key,
                 shopID,
@@ -53,30 +74,81 @@ const Shop = (props) => {
                 endTime,
                 minus,
                 minusList,
+                minusInfo,
                 address,
+                latitude,
+                longitude,
+                location,
+                positionInfo,
                 description,
                 businessTypes,
+                businessTypesList,
+                businessTypesInfo
             }
         })
     }
     useEffect(() => {
-        getShopList()
+        init()
     }, [])
-
-    const toShowEditShopModal = (record) => {
+    async function init() {
+        try {
+            setSpinning(true)
+            await getShopList()
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setSpinning(false)
+        }
+    }
+    function addNewShop() {
+        setEditShopModal(true)
+        setRecord({
+            addShopFlag: true
+        })
+    }
+    function toShowEditShopModal (record) {
         console.log(record)
         setEditShopModal(true)
         setRecord(record)
     }
-    const toCloseEditShopModal = () => {
+    function toCloseEditShopModal () {
         setEditShopModal(false)
     }
-    const toUpdateShopInfo = (shopInfo) => {
-        setDatasource(formatDataSource([shopInfo]))
-        toCloseEditShopModal()
+    async function toUpdateShopInfo(shopInfo) {
+        try {
+            setSpinning(true)
+            toCloseEditShopModal()
+            await getShopList()
+        } catch (error) {
+            console.log('error')
+            console.log(error)
+        } finally {
+            setSpinning(false)
+        }
+    }
+    function removeShopConfirmModal(shopID) {
+        Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined />,
+            content: '是否删除改店铺和店铺下的所有菜品',
+            okText: '删除',
+            cancelText: '取消',
+            onOk: () => toRemoveShop(shopID)
+        });
+    }
+    async function toRemoveShop(shopID) {
+        try {
+            setSpinning(true)
+            await removeShop(shopID)
+            await getShopList()
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setSpinning(false)
+        }
     }
 
-    const toCategory = () => {
+    function toCategory () {
         // history.push({
         //     pathname: '/shop/category',
         //     search: "?shopID=1111",
@@ -86,18 +158,6 @@ const Shop = (props) => {
 
     function onChange(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
-    }
-
-    const confirmEditShop = (values) => {
-        console.log(values)
-        toCloseEditShopModal()
-        // setDatasource([...dataSource, {
-        //     key: Math.random().toString(),
-        //     shopName: '哈哈哈哈哈',
-        //     openTiming: '嘻嘻嘻嘻嘻',
-        //     address: '哈哈哈哈哈',
-        //     description: '嘻嘻嘻嘻嘻',
-        // }])
     }
     const columns = [
         {
@@ -116,7 +176,7 @@ const Shop = (props) => {
         },
         {
             title: '店铺满减',
-            dataIndex: 'minus',
+            dataIndex: 'minusInfo',
         },
         {
             title: '店铺地址',
@@ -128,7 +188,7 @@ const Shop = (props) => {
         },
         {
             title: '店铺业务',
-            dataIndex: 'businessTypes',
+            dataIndex: 'businessTypesInfo',
         },
         {
             title: '店铺操作',
@@ -138,26 +198,21 @@ const Shop = (props) => {
                     <Fragment>
                         <Tag color="cyan" onClick={() => toCategory(record)}>菜品分类</Tag>
                         <Tag color="green" onClick={() => toShowEditShopModal(record)}>编辑店铺</Tag>
-                        <Popconfirm
-                            title="Are you sure delete this task?"
-                            onConfirm={() => deleteShop(record)}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <Tag color="red">删除店铺</Tag>
-                        </Popconfirm>
+                        <Tag color="red" onClick={() => removeShopConfirmModal(record.shopID)}>删除店铺</Tag>
                     </Fragment>
                 )
             }
         }
     ];
     return (
-        <Fragment>
-            <div className="home-title">店铺列表</div>
+        <Spin tip="Loading..." spinning={spinning}>
+            <div className="home-title flex-row flex-a-center flex-j-between">
+                <div>店铺列表</div>
+                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={addNewShop}>新增店铺</Button>
+            </div>
             <Table columns={columns} dataSource={dataSource} onChange={onChange} />
-            {editShopModal && <ShopEdit confirmEditShop={confirmEditShop} toCloseEditShopModal={toCloseEditShopModal} toUpdateShopInfo={toUpdateShopInfo} record={record}/>}
-        </Fragment>
-
+            {editShopModal && <ShopEdit toCloseEditShopModal={toCloseEditShopModal} toUpdateShopInfo={toUpdateShopInfo} record={record} />}
+        </Spin>
     )
 }
 export default Shop

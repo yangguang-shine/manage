@@ -2,18 +2,38 @@ import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, Inpu
 
 import React, { useState, useEffect, Fragment } from 'react';
 import moment from 'moment';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import request from '@/utils/request';
+import { delaySync } from '@/utils/index';
+
+
+import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import './shopEdit.less'
 
 const ShopEdit = (props) => {
     console.log('props:', props)
 
     const [form] = Form.useForm();
+    const [confirmLoading, setConfirmLoading] = useState(false)
     useEffect(() => {
-        console.log(231321)
     }, [props]);
     const handleCancel = () => {
         log('handleCancel')
         props.toCloseEditShopModal()
+    }
+    function editCancel() {
+        console.log('editCancel')
+        props.toCloseEditShopModal()
+    }
+    function editConfirmModal() {
+        Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined />,
+            content: '是否保存已填写信息',
+            okText: '保存',
+            cancelText: '不保存',
+            onCancel: editCancel,
+            onOk: editConfirm
+        });
     }
     const tailLayout = {
         wrapperCol: { offset: 8, span: 16 },
@@ -25,44 +45,53 @@ const ShopEdit = (props) => {
     const onFinishFailed = errorInfo => {
         console.log('Failed:', errorInfo);
     };
-    const layout = {
-        labelCol: {
-            span: 4
-        },
-        wrapperCol: {
-            span: 20
-        }
-    }
-    const timeLayout = {
-        labelCol: {
-            span: 8
-        },
-        wrapperCol: {
-            span: 16
-        }
-    }
 
-    const handleOk = async () => {
+
+
+    const editConfirm = async () => {
         try {
+            setConfirmLoading(true)
             const values = await form.validateFields();
-            // values.endTime = values.endTime.format("HH:mm")
-            // values.startTime = values.startTime.format("HH:mm")
-            console.log(values)
-            const shopInfo = {
-                shopName: values.shopName,
-                startTime: values.startTime.format("HH:mm"),
-                endTime: values.endTime.format("HH:mm"),
-                address: values.address,
-                description: values.description,
-                businessTypes: values.businessTypes,
-                minus: JSON.stringify(values.minusList || []),
-                shopName: values.shopName,
+            const shopInfo = getShopInfo(values)
+            console.log('shopInfo')
+            console.log(shopInfo)
+            if (props.record.addShopFlag) {
+                await addShop(shopInfo)
+            } else {
+                await editShop(shopInfo)
             }
+            setConfirmLoading(false)
             props.toUpdateShopInfo(shopInfo)
         } catch (errorInfo) {
             console.log('Failed:', errorInfo);
         }
     };
+    function getShopInfo(values) {
+        const positionList = values.positionInfo.split(',')
+        const [latitude, longitude] = positionList;
+        return {
+            shopName: values.shopName,
+            startTime: values.startTime.format("HH:mm"),
+            endTime: values.endTime.format("HH:mm"),
+            address: values.address,
+            description: values.description,
+            businessTypes: JSON.stringify(values.businessTypesList),
+            minus: JSON.stringify(values.minusList || []),
+            shopName: values.shopName,
+            latitude,
+            longitude,
+            location: values.location,
+            shopID: props.record.shopID
+        }
+    }
+    async function addShop(shopInfo) {
+        await delaySync()
+        await request.post('/manage/shop/add', shopInfo)
+    }
+    async function editShop(shopInfo) {
+        await delaySync()
+        await request.post('/manage/shop/edit', shopInfo)
+    }
     const format = 'HH:mm';
     const reachRule = [
         {
@@ -70,15 +99,12 @@ const ShopEdit = (props) => {
             validator(_, value, aa) {
                 const pattern = new RegExp(/^[1-9]\d*$/, 'g')
                 if (!pattern.test(value)) {
-                    console.log('pattern.test(value)')
-                    console.log(pattern.test(value))
                     return Promise.reject();
                 }
                 const arr = _.field.split('.')
                 if (+arr[1] === 0) {
                     return Promise.resolve();
                 } else {
-                    console.log(222)
                     if (+value > form.getFieldValue(arr[0]).[+arr[1] - 1].[arr[2]]) {
                         return Promise.resolve();
                     } else {
@@ -95,14 +121,10 @@ const ShopEdit = (props) => {
             validator(_, value, aa) {
                 const pattern = new RegExp(/^[1-9]\d*$/, 'g')
                 if (!pattern.test(value)) {
-                    console.log('pattern.test(value)')
-                    console.log(pattern.test(value))
                     return Promise.reject();
                 }
                 const arr = _.field.split('.')
                 const reach = form.getFieldValue(arr[0]).[arr[1]].['reach'];
-                console.log('reach')
-                console.log(reach)
                 if (+reach > +value) {
                     return Promise.resolve();
                 } else {
@@ -113,8 +135,26 @@ const ShopEdit = (props) => {
             message: '请输入正确',
         },
     ]
-    console.log('props.record.minus')
-    console.log(props.record.minus)
+
+    const layout = {
+        labelCol: {
+            span: 4
+        },
+        wrapperCol: {
+            span: 20
+        }
+    }
+    const timeLayout = {
+        labelCol: {
+            span: 8
+        },
+        wrapperCol: {
+            span: 16
+        }
+    }
+    function toGetAddress() {
+        window.open('https://lbs.qq.com/getPoint/', '_blank')
+    }
     const Demo = (
         <Form
             form={form}
@@ -143,16 +183,16 @@ const ShopEdit = (props) => {
                 label="店铺简介"
                 name="description"
                 rules={[{ required: true, message: '请输入店铺简介' }]}
-                initialValue={props.record.description || 'hhh'}
+                initialValue={props.record.description}
             >
                 <Input />
             </Form.Item>
 
             <Form.Item
                 label="店铺业务"
-                name="businessTypes"
+                name="businessTypesList"
                 rules={[{ required: true, message: '请选择业务类型' }]}
-                initialValue={props.record.businessTypes}
+                initialValue={props.record.businessTypesList}
             >
                 <Checkbox.Group>
                     <Checkbox value="2">外卖</Checkbox>
@@ -166,7 +206,7 @@ const ShopEdit = (props) => {
                         label="营业开始"
                         name="startTime"
                         rules={[{ required: true, message: '请输入营业开始时间' }]}
-                        initialValue={moment(props.record.startTime, format)}
+                        initialValue={props.record.startTime ? moment(props.record.startTime, format) : ''}
                     >
                         <TimePicker format={format} />
                     </Form.Item>
@@ -177,17 +217,69 @@ const ShopEdit = (props) => {
                         label="营业结束"
                         name="endTime"
                         rules={[{ required: true, message: '请输入营业结束时间' }]}
-                        initialValue={moment(props.record.endTime, format)}
+                        initialValue={props.record.endTime ? moment(props.record.endTime, format) : ''}
+
                     >
                         <TimePicker format={format} />
                     </Form.Item>
                 </Col>
             </Row>
+            <Row gutter={8}>
+                <Col span={16}>
+                    <Form.Item
+                        {
+                        ...{
+                            labelCol: {
+                                span: 6
+                            },
+                            wrapperCol: {
+                                span: 18
+                            }
+                        }
+                        }
+                        label="店铺坐标"
+                        name="positionInfo"
+                        initialValue={props.record.positionInfo}
+                        rules={[{ required: true, message: '请选择店铺坐标' }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Button onClick={toGetAddress}>去获取坐标信息</Button>
+                </Col>
+            </Row>
 
+
+            <Row gutter={8}>
+                <Col span={16}>
+                    <Form.Item
+                        {
+                        ...{
+                            labelCol: {
+                                span: 6
+                            },
+                            wrapperCol: {
+                                span: 18
+                            }
+                        }
+                        }
+                        label="店铺地址"
+                        name="location"
+                        initialValue={props.record.location}
+                        rules={[{ required: true, message: '请选择店铺地址' }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Button>去获取店铺地址</Button>
+                </Col>
+            </Row>
             <Form.Item
-                label="店铺地址"
+                label="详细地址"
                 name="address"
-                rules={[{ required: true, message: '请选择店铺地址' }]}
+                rules={[{ required: true, message: '请输入店铺详细地址' }]}
                 initialValue={props.record.address}
             >
                 <Input />
@@ -195,8 +287,8 @@ const ShopEdit = (props) => {
             <Form.Item
                 label="店铺满减"
             >
-                <Form.List name='minusList' 
-                initialValue={props.record.minusList}
+                <Form.List name='minusList'
+                    initialValue={props.record.minusList}
                 >
                     {
                         (fields, { add, remove }, { error }) => (
@@ -237,28 +329,10 @@ const ShopEdit = (props) => {
                 </Form.List>
 
             </Form.Item>
-
-            {/* <Form.Item
-                label="店铺满减"
-                name="minus"
-                rules={[{ required: true, message: 'Please input your username!' }]}
-                initialValue={props.record.minus}
-            >
-                <Input />
-            </Form.Item> */}
         </Form>
     )
-
-
-
     return (
-        <Modal
-            title="添加店铺"
-            visible
-            onOk={handleOk}
-            onCancel={handleCancel}
-            centered
-        >
+        <Modal title="添加店铺" visible onOk={editConfirm} onCancel={editConfirmModal} centered confirmLoading={confirmLoading}>
             {Demo}
         </Modal>
     )

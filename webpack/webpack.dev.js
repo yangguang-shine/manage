@@ -9,7 +9,7 @@ const developmentConfig = merge(CommonConfig, {
     devServer: {
         port: 7777, // 自定义修改8888端口
         contentBase: path.join(__dirname, '/dist'),
-        hot: true,
+        // hot: true,
         historyApiFallback: true,
         open: false,
         host: "dev.jr.jd.com",
@@ -49,7 +49,7 @@ const developmentConfig = merge(CommonConfig, {
     // webpack 开发模式插件
     plugins: [
         // 热模块替换
-        new webpack.HotModuleReplacementPlugin(),
+        // new webpack.HotModuleReplacementPlugin(),
         // new webpack.DefinePlugin({
         //     'process.env.NODE_ENV': 'This Is The Test Text.',
         // }),
