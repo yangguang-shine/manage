@@ -26,7 +26,24 @@ module.exports = {
                 include: [
                     path.join(__dirname, '../src')
                 ],
-                use: ['happypack/loader?id=babel'],
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/preset-env', '@babel/preset-react'],
+                            "plugins": [
+                                [
+                                    "import", {
+                                        "libraryName": "antd",
+                                        "libraryDirectory": "es",
+                                        "style": "css"
+                                    }
+                                ]
+                            ]
+                        },
+             
+                    },
+                ],
             },
             {
                 test: /\.(png|jpe?g)$/,
@@ -58,27 +75,6 @@ module.exports = {
             //     collapseWhitespace: true, // 删除空白符与换行符
             //     minifyCSS: true, // 压缩内联css
             // },
-        }),
-        new HappyPack({
-            id: 'babel', // 用唯一的标识符id，来代表当前的HappyPack是用来处理一类特定的文件
-            loaders: [
-                {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react']
-                    },
-                    "plugins": [
-                        [
-                            "import", {
-                                "libraryName": "antd",
-                                "libraryDirectory": "es",
-                                "style": "css"
-                            }
-                        ]
-                    ]
-                },
-            ],
-            threadPool: HappyPackThreadPool,
         }),
         // new webpack.optimize.CommonsChunkPlugin({
         //     name: 'common' // 指定公共 bundle 的名称。

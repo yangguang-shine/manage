@@ -3,12 +3,15 @@ import { Table, Tag, Popconfirm, Modal, Button, Spin } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom'
 import ShopEdit from './shopEdit';
-import request from '@/utils/request';
+import useFetch from '@/utils/useFetch';
 import { delaySync } from '@/utils/index';
 import './index.less'
+import { imgHost } from '@/config/index'
+
 
 const Shop = (props) => {
     const history = useHistory()
+    const fetch = useFetch()
     const [dataSource, setDatasource] = useState([])
     const [record, setRecord] = useState({})
     const [editShopModal, setEditShopModal] = useState(false)
@@ -16,13 +19,13 @@ const Shop = (props) => {
     let key = 0;
     async function getShopList (){
         await delaySync()
-        const res = await request.get('/manage/shop/list')
+        const res = await fetch('/manage/shop/list')
         const newDataSource = formatDataSource(res)
         setDatasource(newDataSource)
     }
     async function removeShop(shopID) {
         await delaySync()
-        await request.post('/manage/shop/remove', {
+        await fetch('/manage/shop/remove', {
             shopID
         });
     }
@@ -30,7 +33,7 @@ const Shop = (props) => {
         return list.map((item) => {
             key++;
             const shopID = item.shopID
-            const shopImg = item.imgUrl
+            const imgUrl = item.imgUrl
             const shopName = item.shopName
             const startTime = item.startTime
             const endTime = item.endTime
@@ -67,7 +70,7 @@ const Shop = (props) => {
             return {
                 key,
                 shopID,
-                shopImg,
+                imgUrl,
                 shopName,
                 openTiming,
                 startTime,
@@ -162,8 +165,12 @@ const Shop = (props) => {
     const columns = [
         {
             title: '店铺图片',
-            dataIndex: 'shopImg',
-
+            dataIndex: 'imgUrl',
+            render: (text, record, index) => {
+                return (
+                    <img src={`${imgHost}/shop/${record.imgUrl}`} className="shop-img" alt=""/>
+                )
+            }
         },
         {
             title: '店铺名称',

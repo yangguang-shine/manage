@@ -7,11 +7,13 @@ const webpack = require('webpack')
 const developmentConfig = merge(CommonConfig, {
     // 启用 webpack 本地服务
     devServer: {
-        port: 7777, // 自定义修改8888端口
-        contentBase: path.join(__dirname, '/dist'),
+        port: 7777, // 自定义修改8888端口,
+        static: {
+            directory: path.join(__dirname, '/dist'),
+        },
         // hot: true,
         historyApiFallback: true,
-        open: false,
+        open: true,
         host: "dev.jr.jd.com",
         // 代理跨域
         proxy: {
@@ -41,6 +43,14 @@ const developmentConfig = merge(CommonConfig, {
                     'less-loader',
                 ]
             },
+            {
+                test: /\.sass$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader',
+                ]
+            },
         ]
     },
     // 使用 source-map
@@ -48,12 +58,6 @@ const developmentConfig = merge(CommonConfig, {
 
     // webpack 开发模式插件
     plugins: [
-        // 热模块替换
-        // new webpack.HotModuleReplacementPlugin(),
-        // new webpack.DefinePlugin({
-        //     'process.env.NODE_ENV': 'This Is The Test Text.',
-        // }),
-
     ]
 })
 console.log('development config')

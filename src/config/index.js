@@ -1,0 +1,1 @@
+export const imgHost = `http://dev.jr.jd.com:9999/upload/img/`

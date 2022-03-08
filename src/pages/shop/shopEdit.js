@@ -1,9 +1,13 @@
-import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber } from 'antd';
+import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber, Upload } from 'antd';
+
+import { UploadOutlined } from '@ant-design/icons';
 
 import React, { useState, useEffect, Fragment } from 'react';
 import moment from 'moment';
-import request from '@/utils/request';
+import useFetch from '@/utils/useFetch';
 import { delaySync } from '@/utils/index';
+import { imgHost } from '@/config/index'
+import { baseServerUrl } from '../../utils/config'
 
 
 import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -11,10 +15,20 @@ import './shopEdit.less'
 
 const ShopEdit = (props) => {
     console.log('props:', props)
-
+    const fetch = useFetch()
     const [form] = Form.useForm();
     const [confirmLoading, setConfirmLoading] = useState(false)
+    const defaultFileList = [
+        {
+            name: '店铺图片',
+            status: 'done',
+            url: `${imgHost}/shop/${props.record.imgUrl}`,
+            thumbUrl: `${imgHost}/shop/${props.record.imgUrl}`,
+        }
+    ]
+
     useEffect(() => {
+        console.log('props change')
     }, [props]);
     const handleCancel = () => {
         log('handleCancel')
@@ -52,6 +66,8 @@ const ShopEdit = (props) => {
         try {
             setConfirmLoading(true)
             const values = await form.validateFields();
+            console.log('values')
+            console.log(values)
             const shopInfo = getShopInfo(values)
             console.log('shopInfo')
             console.log(shopInfo)
@@ -63,7 +79,9 @@ const ShopEdit = (props) => {
             setConfirmLoading(false)
             props.toUpdateShopInfo(shopInfo)
         } catch (errorInfo) {
+            setConfirmLoading(false)
             console.log('Failed:', errorInfo);
+        } finally {
         }
     };
     function getShopInfo(values) {
@@ -81,16 +99,17 @@ const ShopEdit = (props) => {
             latitude,
             longitude,
             location: values.location,
-            shopID: props.record.shopID
+            shopID: props.record.shopID,
+            imgUrl: values.imgUrl
         }
     }
     async function addShop(shopInfo) {
         await delaySync()
-        await request.post('/manage/shop/add', shopInfo)
+        await fetch('/manage/shop/add', shopInfo)
     }
     async function editShop(shopInfo) {
         await delaySync()
-        await request.post('/manage/shop/edit', shopInfo)
+        await fetch('/manage/shop/edit', shopInfo)
     }
     const format = 'HH:mm';
     const reachRule = [
@@ -154,6 +173,29 @@ const ShopEdit = (props) => {
     }
     function toGetAddress() {
         window.open('https://lbs.qq.com/getPoint/', '_blank')
+    }
+    function shopImgUpload(e) {
+        console.log(111)
+        console.log(e)
+    }
+    function normFile(e) {
+        console.log(222)
+        console.log(e)
+        // return e.fileList
+        const file = e.file
+        const status = file.status
+        if (status === 'done') {
+            console.log('file')
+            console.log(file)
+            const response = file.response
+            if (response.code !== '000') {
+                file.status = 'error'
+                return null
+            } else {
+                return response.data.imgUrl
+            }
+        }
+        return null
     }
     const Demo = (
         <Form
@@ -283,6 +325,20 @@ const ShopEdit = (props) => {
                 initialValue={props.record.address}
             >
                 <Input />
+            </Form.Item>
+
+            <Form.Item
+                name="imgUrl"
+                label="上传图片"
+                valuePropName="imgUrl"
+                getValueFromEvent={normFile}
+                rules={[{ required: true, message: '请上传图片' }]}
+                initialValue={props.record.imgUrl || ''}
+            // extra="longgggggggggggggggggggggggggggggggggg"
+            >
+                <Upload name="shopImg" action={`${baseServerUrl}/manage/uploadImg/shop`} listType="picture" onChange={shopImgUpload} maxCount={1} defaultFileList={[...defaultFileList]}>
+                    <Button icon={<UploadOutlined />}>上传店铺图片</Button>
+                </Upload>
             </Form.Item>
             <Form.Item
                 label="店铺满减"
