@@ -9,7 +9,7 @@ module.exports = {
 
     // webpack 编译入口
     entry: {
-        index: path.join(__dirname, '../src/index.js'),
+        index: path.join(__dirname, '../src/main.js'),
         // vendor: ['react']
     },
     // webpack 编译出口
@@ -22,27 +22,13 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.jsx?$/,
                 include: [
                     path.join(__dirname, '../src')
                 ],
+                exclude: ['/node_modeles/'],
                 use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: ['@babel/preset-env', '@babel/preset-react'],
-                            "plugins": [
-                                [
-                                    "import", {
-                                        "libraryName": "antd",
-                                        "libraryDirectory": "es",
-                                        "style": "css"
-                                    }
-                                ]
-                            ]
-                        },
-             
-                    },
+                    'babel-loader'
                 ],
             },
             {

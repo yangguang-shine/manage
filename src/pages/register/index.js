@@ -7,6 +7,6 @@ export default class  extends React.Component {
         super(props)
     }
     render() {
-        return <div>首页</div>
+        return <div>注册</div>
     }
 }

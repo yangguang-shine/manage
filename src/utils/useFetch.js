@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { baseServerUrl } from './config'
 // http://dev.jr.jd.com:7777/api/user/address/list
 axios.defaults.baseURL = baseServerUrl;
 export default function useFetch() {
-    const history = useHistory()
+    const navigate = useNavigate()
     return (url, params, options = {}) => {
         const defaultOptions = {
             autoLoginFlag: true
@@ -25,7 +25,9 @@ export default function useFetch() {
                 if (code === '000') {
                     resolve(data)
                 } else if (code === '200' && fetchOptions.autoLoginFlag) {
-                    history.replace('/login')
+                    navigate('/login', {
+                        replace: true
+                    })
                     reject(msg)
                 } else {
                     reject(msg)

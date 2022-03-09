@@ -8,7 +8,7 @@ body,ul,li,p,h1,h2,h3,h4,h5,h6,img,br,hr,table,tr,td,dl,dt,dd,form {
 }
 body {
 	font-family: Arial,"微软雅黑";
-	font-size: 30px;
+    font-size: 30px;
 }
 .clear {
 	clear: both;

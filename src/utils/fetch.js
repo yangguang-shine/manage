@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { useHistory, withRouter } from 'react-router-dom'
+import { useNavigate, withRouter } from 'react-router-dom'
 
 export const baseURL = 'http://dev.jr.jd.com:7777/api'
 // http://dev.jr.jd.com:7777/api/user/address/list
 axios.defaults.baseURL = baseURL;
 export default withRouter(function ferch (url, params, options = {}){
-    const history = useHistory()
+    const navigate = useNavigate()
     console.log(history)
     const defaultOptions = {
         autoLoginFlag: true

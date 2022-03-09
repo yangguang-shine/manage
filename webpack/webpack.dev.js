@@ -32,8 +32,9 @@ const developmentConfig = merge(CommonConfig, {
                 test: /\.css$/,
                 use: [
                     'style-loader',
-                    'css-loader',
-                ]
+                    'css-loader'
+                ],
+                "sideEffects": true
             },
             {
                 test: /\.less$/,
@@ -41,7 +42,9 @@ const developmentConfig = merge(CommonConfig, {
                     'style-loader',
                     'css-loader',
                     'less-loader',
-                ]
+                ],
+                "sideEffects": true
+
             },
             {
                 test: /\.sass$/,
@@ -49,17 +52,13 @@ const developmentConfig = merge(CommonConfig, {
                     'style-loader',
                     'css-loader',
                     'sass-loader',
-                ]
+                ],
+                "sideEffects": true
+
             },
         ]
     },
-    // 使用 source-map
-    devtool: 'cheap-module-source-map',
-
-    // webpack 开发模式插件
     plugins: [
     ]
 })
-console.log('development config')
-console.log(developmentConfig)
 module.exports = developmentConfig

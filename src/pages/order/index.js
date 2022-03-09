@@ -4,9 +4,9 @@ import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 // import ShopEdit from './shopEdit';
 import useFetch from '@/utils/useFetch';
-import { delaySync } from '@/utils/index';
+import { delaySync } from '@/utils';
 import './index.less'
-import { imgHost } from '@/config/index'
+import { imgHost } from '@/config'
 
 
 const Shop = (props) => {
@@ -212,14 +212,7 @@ const Shop = (props) => {
         }
     ];
     return (
-        <Spin tip="Loading..." spinning={spinning}>
-            {/* <div className="home-title flex-row flex-a-center flex-j-between">
-                <div>店铺列表</div>
-                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={addNewShop}>新增店铺</Button>
-            </div>
-            <Table columns={columns} dataSource={dataSource} onChange={onChange} /> */}
-            {/* {editShopModal && <ShopEdit toCloseEditShopModal={toCloseEditShopModal} toUpdateShopInfo={toUpdateShopInfo} record={record} />} */}
-        </Spin>
+        <div>order</div>
     )
 }
 export default Shop
