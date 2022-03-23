@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
 import { baseServerUrl } from './config'
+import { delaySync } from '@/utils/index'
+
 // http://dev.jr.jd.com:7777/api/user/address/list
 axios.defaults.baseURL = baseServerUrl;
 export default function useFetch() {
@@ -18,7 +20,8 @@ export default function useFetch() {
                 url,
                 method: 'post',
                 data: params
-            }).then((result) => {
+            }).then(async (result) => {
+                await delaySync()
                 const code = result.data.code
                 const data = result.data.data
                 const msg = result.data.msg

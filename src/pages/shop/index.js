@@ -1,39 +1,44 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { Table, Tag, Popconfirm, Modal, Button, Spin } from 'antd';
+import { Table, Tag, Popconfirm, Modal, Button, Spin, Space, Row, Col } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate,useLocation,  Outlet } from 'react-router-dom'
 // import ShopEdit from './shopEdit';
+import ShopEdit from './ShopEdit';
 import useFetch from '@/utils/useFetch';
 import { delaySync } from '@/utils/index';
 import './index.less'
-import { imgHost } from '@/config/index'
+import { shopImgPath } from '@/config/index'
 
+import { ChromePicker } from 'react-color'
 
 const Shop = (props) => {
     const navigate = useNavigate()
     const fetch = useFetch()
     const [dataSource, setDatasource] = useState([])
     const [record, setRecord] = useState({})
-    const [editShopModal, setEditShopModal] = useState(false)
+    const [editModalFlag, setEditModalFlag] = useState(false)
     const [spinning, setSpinning] = useState(false)
+    const [showCategoryFlag, setShowCategoryFlag] = useState(false);
+    const location = useLocation()
     let key = 0;
-    async function getShopList (){
-        await delaySync()
+    async function getShopList() {
         const res = await fetch('/manage/shop/list')
+        // res.shift()
         const newDataSource = formatDataSource(res)
         setDatasource(newDataSource)
     }
     async function removeShop(shopID) {
-        await delaySync()
         await fetch('/manage/shop/remove', {
             shopID
         });
     }
-    function formatDataSource (list = []) {
+    function formatDataSource(list = []) {
         return list.map((item) => {
+            // item.minus = JSON.stringify([])
+            // item.businessTypes = JSON.stringify([])
             key++;
             const shopID = item.shopID
-            const imgUrl = item.imgUrl
+            const imgUrl = item.imgUrl || ''
             const shopName = item.shopName
             const startTime = item.startTime
             const endTime = item.endTime
@@ -42,8 +47,8 @@ const Shop = (props) => {
             const minusList = JSON.parse(item.minus)
             const minusInfo = minusList.reduce((str, item) => {
                 const reach = item.reach
-                const minus = item.minus
-                return str ? `${str},满${reach}减${minus}` : `满${reach}减${minus}`
+                const reduce = item.reduce
+                return str ? `${str},满${reach}减${reduce}` : `满${reach}减${reduce}`
             }, '')
             const address = item.address
             const latitude = item.latitude
@@ -91,8 +96,16 @@ const Shop = (props) => {
         })
     }
     useEffect(() => {
-        init()
-    }, [])
+        // location.pathname.startsWith('/shop')
+        console.log('location   shop')
+        const pathname = location.pathname
+        if (pathname === '/shop') {
+            setShowCategoryFlag(false)
+            init()
+        } else if (pathname.startsWith('/shop/category')) {
+            setShowCategoryFlag(true)
+        }
+    }, [location])
     async function init() {
         try {
             setSpinning(true)
@@ -103,24 +116,20 @@ const Shop = (props) => {
             setSpinning(false)
         }
     }
-    function addNewShop() {
-        setEditShopModal(true)
-        setRecord({
-            addShopFlag: true
-        })
-    }
-    function toShowEditShopModal (record) {
-        console.log(record)
-        setEditShopModal(true)
+    function toShowEditModalFlag(record) {
+        toShowEditModal()
         setRecord(record)
     }
-    function toCloseEditShopModal () {
-        setEditShopModal(false)
+    function toShowEditModal() {
+        setEditModalFlag(true)
     }
-    async function toUpdateShopInfo(shopInfo) {
+    function toCloseEditModal() {
+        setEditModalFlag(false)
+    }
+    async function toUpdateShopList() {
         try {
+            toCloseEditModal()
             setSpinning(true)
-            toCloseEditShopModal()
             await getShopList()
         } catch (error) {
             console.log('error')
@@ -129,14 +138,14 @@ const Shop = (props) => {
             setSpinning(false)
         }
     }
-    function removeShopConfirmModal(shopID) {
+    function removeShopConfirmModal(record) {
         Modal.confirm({
             title: '提示',
             icon: <ExclamationCircleOutlined />,
             content: '是否删除改店铺和店铺下的所有菜品',
             okText: '删除',
             cancelText: '取消',
-            onOk: () => toRemoveShop(shopID)
+            onOk: () => toRemoveShop(record.shopID)
         });
     }
     async function toRemoveShop(shopID) {
@@ -151,7 +160,10 @@ const Shop = (props) => {
         }
     }
 
-    function toCategory () {
+    function toCategoryList(record) {
+        const {shopID} = record
+        navigate(`category?shopID=${shopID}`)
+        setShowCategoryFlag(true)
         // history.push({
         //     pathname: '/shop/category',
         //     search: "?shopID=1111",
@@ -168,7 +180,7 @@ const Shop = (props) => {
             dataIndex: 'imgUrl',
             render: (text, record, index) => {
                 return (
-                    <img src={`${imgHost}/shop/${record.imgUrl}`} className="shop-img" alt=""/>
+                    <img src={`${shopImgPath}/${record.imgUrl}`} className="shop-img" alt="" />
                 )
             }
         },
@@ -202,24 +214,40 @@ const Shop = (props) => {
             dataIndex: 'shopOperate',
             render: (text, record, index) => {
                 return (
-                    <Fragment>
-                        <Tag color="cyan" onClick={() => toCategory(record)}>菜品分类</Tag>
-                        <Tag color="green" onClick={() => toShowEditShopModal(record)}>编辑店铺</Tag>
-                        <Tag color="red" onClick={() => removeShopConfirmModal(record.shopID)}>删除店铺</Tag>
-                    </Fragment>
+                    <Space>
+                        <Tag color="cyan" onClick={() => toCategoryList(record)}>菜品分类</Tag>
+                        <Tag color="green" onClick={() => toShowEditModalFlag(record)}>编辑店铺</Tag>
+                        <Tag color="red" onClick={() => removeShopConfirmModal(record)}>删除店铺</Tag>
+                    </Space>
                 )
             }
         }
     ];
+    function changeColor(a, b,c) {
+        console.log(a,b,c)
+    }
     return (
-        <Spin tip="Loading..." spinning={spinning}>
+        showCategoryFlag ? <Outlet></Outlet> : <Spin tip="Loading..." spinning={spinning}>
+            <Row align="middle" justify="center">
+                <Col span={20}>
+                    店铺列表
+                </Col>
+                <Col span={4}>
+                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditModalFlag({})}>新增店铺</Button>
+                </Col>
+            </Row>
+            <div>
+
+            </div>
+
             {/* <div className="home-title flex-row flex-a-center flex-j-between">
                 <div>店铺列表</div>
-                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={addNewShop}>新增店铺</Button>
-            </div>
-            <Table columns={columns} dataSource={dataSource} onChange={onChange} /> */}
-            {/* {editShopModal && <ShopEdit toCloseEditShopModal={toCloseEditShopModal} toUpdateShopInfo={toUpdateShopInfo} record={record} />} */}
-        </Spin>
+                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={toAddShop}>新增店铺</Button>
+            </div> */}
+            <Table style={{ 'marginTop': '30px' }} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.shopID}/>
+            {/* {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} />} */}
+            {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} > </ShopEdit>}
+        </Spin> 
     )
 }
 export default Shop

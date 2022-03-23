@@ -16,14 +16,16 @@ const BaseLayout = props => {
     const [openKeys, setOpenKeys] = useState([])
     const [selectedKeys, setSelectedKeys] = useState([])
     useEffect(() => {
-        console.log(location)
+        console.log('>>>>>>>>>>>>>>>>')
         if (location.pathname === '/') {
             navigate('/home', { replace: true })
         }
-        if (location.pathname === '/shop') {
+        if (location.pathname.startsWith('/shop')) {
             setOpenKeys(['sub_shop'])
+            setSelectedKeys(['/shop'])
+        } else {
+            setSelectedKeys([location.pathname])
         }
-        setSelectedKeys([location.pathname])
         // setSelectKeys([location.pathname])
     }, [location])
     function onOpenChange(openKeys) {
@@ -69,7 +71,7 @@ const BaseLayout = props => {
                     </SubMenu>
                 </Menu>
             </Sider>
-            <Content className="main-content"><Outlet  /></Content>
+            <Content className="main-content"><Outlet /></Content>
         </Layout >
     );
 };

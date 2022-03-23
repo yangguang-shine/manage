@@ -11,7 +11,7 @@ const developmentConfig = merge(CommonConfig, {
         static: {
             directory: path.join(__dirname, '/dist'),
         },
-        // hot: true,
+        hot: true,
         historyApiFallback: true,
         open: true,
         host: "dev.jr.jd.com",
@@ -59,6 +59,9 @@ const developmentConfig = merge(CommonConfig, {
         ]
     },
     plugins: [
+        new webpack.HotModuleReplacementPlugin({
+            // Options...
+          })
     ]
 })
 module.exports = developmentConfig

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useNavigate, withRouter } from 'react-router-dom'
-
+import { delaySync } from '@/utils/index'
+import { message} from 'antd'
 export const baseURL = 'http://dev.jr.jd.com:7777/api'
 // http://dev.jr.jd.com:7777/api/user/address/list
 axios.defaults.baseURL = baseURL;
@@ -19,7 +20,8 @@ export default withRouter(function ferch (url, params, options = {}){
             url,
             method: 'post',
             data: params
-        }).then((result) => {
+        }).then(async (result) => {
+            await delaySync()
             const code = result.data.code
             const data = result.data.data
             const msg = result.data.msg
@@ -29,6 +31,7 @@ export default withRouter(function ferch (url, params, options = {}){
                 history.replace('/login')
                 reject(msg)
             } else {
+                message.error(msg)
                 reject(msg)
             }
         }).catch((err) => {
