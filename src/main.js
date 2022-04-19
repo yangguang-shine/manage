@@ -30,17 +30,8 @@ export default class App extends React.Component {
                                 <Route path="food" element={<Food></Food>}></Route>
                             </Route>
                         </Route>
-                        <Route path='category' element={<Category></Category>}>
-                            {/* <Route path='category' element={<Category></Category>}>
-                                <Route path="foodInfo" element={<Food></Food>}></Route>
-                            </Route> */}
-                        </Route>
-
                         <Route path='order' element={<Shop></Shop>}>
                         </Route>
-                        {/* <Route path={'home'} exact={false} element={Home} />
-                        <Route path={'shop/category/foodInfo'} exact={false} element={Food} />
-                        <Route path={'shop/category'} exact={false} element={Category} /> */}
                     </Route>
                     <Route path="*" element={<Navigate to='/home' replace></Navigate>} />
                 </Routes>

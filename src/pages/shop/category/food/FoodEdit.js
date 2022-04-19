@@ -21,7 +21,7 @@ const FoodEdit = (props) => {
     if (props.record.foodID) {
         defaultFileList = [
             {
-                name: '店铺图片',
+                name: '菜品图片',
                 status: 'done',
                 url: `${foodImgPath}/${props.record.imgUrl}`,
                 thumbUrl: `${foodImgPath}/${props.record.imgUrl}`,
@@ -138,7 +138,7 @@ const FoodEdit = (props) => {
                 rules={[{ required: true, message: '请输入店铺名称' }]}
             // initialValue={props.record.shopName}
             >
-                <Input />
+                <InputNumber />
             </Form.Item>
             <Form.Item
                 label="菜品单位"
@@ -147,6 +147,22 @@ const FoodEdit = (props) => {
             // initialValue={props.record.shopName}
             >
                 <Input />
+            </Form.Item>
+            <Form.Item
+                label="包装价格"
+                name="packPrice"
+                rules={[{ required: true, message: '请输入包装' }]}
+            // initialValue={props.record.shopName}
+            >
+                <InputNumber />
+            </Form.Item>
+            <Form.Item
+                label="库存数量"
+                name="reserveCount"
+                rules={[{ required: true, message: '请输入库存数量' }]}
+            // initialValue={props.record.shopName}
+            >
+                <InputNumber />
             </Form.Item>
 
 

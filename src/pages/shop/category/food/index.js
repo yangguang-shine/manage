@@ -132,9 +132,14 @@ const Food = (props) => {
             title: '菜品单位',
             dataIndex: 'unit',
         },
-  
-      
-
+        {
+            title: '包装价格',
+            dataIndex: 'packPrice',
+        },
+        {
+            title: '库存数量',
+            dataIndex: 'reserveCount',
+        },
         {
             title: '菜品操作',
             dataIndex: 'foodOperate',

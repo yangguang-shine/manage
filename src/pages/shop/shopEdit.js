@@ -1,24 +1,28 @@
 import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber, Upload } from 'antd';
 
 import { UploadOutlined } from '@ant-design/icons';
-
+import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import React, { useState, useEffect, Fragment } from 'react';
 import moment from 'moment';
 import useFetch from '@/utils/useFetch';
 import { delaySync } from '@/utils/index.js';
 import { shopImgPath } from '@/config/index.js'
 import { baseServerUrl } from '../../utils/config.js'
-import { ChromePicker } from 'react-color'
+import { SketchPicker } from 'react-color'
+import './ShopEdit.less';
 
-
-import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 // import './shopEdit.less'
 
 const ShopAdd = (props) => {
-    console.log('props:', props)
+    console.log('props.record.mainColor')
+    console.log(props.record.mainColor)
     const fetch = useFetch()
     const [form] = Form.useForm();
-    const [confirmLoading, setConfirmLoading] = useState(false)
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [color, setColor] = useState(props.record.mainColor || '#EB0808');
+    const [colorPickerFlag, setColorPickerFlag] = useState(false);
+    const [deliverItemFlag, setDeliverItemFlag] = useState(props.record.businessTypesList.includes('2') ? true : false);
+
     const defaultFileList = [
         {
             name: '店铺图片',
@@ -26,7 +30,7 @@ const ShopAdd = (props) => {
             url: `${shopImgPath}/${props.record.imgUrl}`,
             thumbUrl: `${shopImgPath}/${props.record.imgUrl}`,
         }
-    ]
+    ];
 
     function editCancel() {
         props.toCloseEditModal()
@@ -83,7 +87,8 @@ const ShopAdd = (props) => {
             longitude,
             location: values.location,
             shopID: props.record.shopID,
-            imgUrl: values.imgUrl || ''
+            imgUrl: values.imgUrl || '',
+            mainColor: values.mainColor
         }
     }
     async function addShop(shopInfo) {
@@ -163,6 +168,19 @@ const ShopAdd = (props) => {
         }
         return ''
     }
+    function colorPickerChange(info) {
+        setColor(info.hex)
+        form.setFieldsValue({
+            mainColor: info.hex
+        })
+        console.log(info)
+    }
+    function tooglePicker() {
+        setColorPickerFlag(!colorPickerFlag)
+    }
+    function onValuesChange(changedValues, allValues) {
+        (changedValues.businessTypesList || []).includes('2') ? setDeliverItemFlag(true) : setDeliverItemFlag(false)
+    }
     const ShopInfoForm = (
         <Form
             form={form}
@@ -173,6 +191,7 @@ const ShopAdd = (props) => {
                 span: 20
             }}
             name="basic"
+            onValuesChange={onValuesChange}
             initialValues={{ ...props.record, startTime: props.record.startTime && moment(props.record.startTime, format), endTime: props.record.endTime && moment(props.record.endTime, format), }}
         >
             <Form.Item
@@ -192,11 +211,23 @@ const ShopAdd = (props) => {
                 <Input />
             </Form.Item>
             <Form.Item
-                label="店铺主色调"
-                name="mianColor"
-                rules={[{ required: true, message: '请输入店铺简介' }]}
+                label="店铺色调"
+                name="mainColor"
+                rules={[{ required: true, message: '请输入店铺色调' }]}
             >
-                < ChromePicker></ChromePicker>
+                <div>
+                    <div style={{
+                        width: '80px',
+                        height: '32px',
+                        background: color
+                    }} className='select-color-button' onClick={tooglePicker}></div>
+                    {
+                        colorPickerFlag ? <div className='color-picker-box'>
+                            <div className='color-picker-overlay' onClick={tooglePicker}></div>
+                            <SketchPicker color={color} onChange={colorPickerChange}></SketchPicker>
+                        </div> : null
+                    }
+                </div>
             </Form.Item>
 
             <Form.Item
@@ -206,10 +237,19 @@ const ShopAdd = (props) => {
             // initialValue={props.record.businessTypesList}
             >
                 <Checkbox.Group>
+                    <Checkbox value="1">堂食</Checkbox>
                     <Checkbox value="2">外卖</Checkbox>
-                    <Checkbox value="3">堂食</Checkbox>
+                    <Checkbox value="3">自提</Checkbox>
                 </Checkbox.Group>
             </Form.Item>
+            {
+                deliverItemFlag ? <Form.Item
+                    label="起送价格"
+                    name="deliverPrice">
+                    <InputNumber />
+                </Form.Item> : null
+            }
+
             <Row >
                 <Col className="gutter-row" span={12}>
                     <Form.Item

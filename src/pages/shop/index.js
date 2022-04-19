@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Table, Tag, Popconfirm, Modal, Button, Spin, Space, Row, Col } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useNavigate,useLocation,  Outlet } from 'react-router-dom'
+import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 // import ShopEdit from './shopEdit';
 import ShopEdit from './ShopEdit';
 import useFetch from '@/utils/useFetch';
@@ -56,15 +56,17 @@ const Shop = (props) => {
             const location = item.location
             const positionInfo = `${latitude},${longitude}`
             const description = item.description
+            const mainColor = item.mainColor
             const businessTypes = item.businessTypes
             const businessTypesList = JSON.parse(item.businessTypes)
             const businessTypesInfo = businessTypesList.reduce((str, item) => {
                 let type = ''
-                if (+item === 2) {
-                    type = '外卖'
-
-                } else if (+item === 3) {
+                if (+item === 1) {
                     type = '堂食'
+                } else if (+item === 2) {
+                    type = '外卖'
+                } else if (+item === 3) {
+                    type = '自提'
                 }
                 if (type) {
                     return str ? `${str},${type}` : `${type}`
@@ -72,6 +74,9 @@ const Shop = (props) => {
                     return str
                 }
             }, '')
+            const deliverPrice = item.deliverPrice || 20
+
+            
             return {
                 key,
                 shopID,
@@ -89,9 +94,11 @@ const Shop = (props) => {
                 location,
                 positionInfo,
                 description,
+                mainColor,
                 businessTypes,
                 businessTypesList,
-                businessTypesInfo
+                businessTypesInfo,
+                deliverPrice
             }
         })
     }
@@ -161,7 +168,7 @@ const Shop = (props) => {
     }
 
     function toCategoryList(record) {
-        const {shopID} = record
+        const { shopID } = record
         navigate(`category?shopID=${shopID}`)
         setShowCategoryFlag(true)
         // history.push({
@@ -206,8 +213,25 @@ const Shop = (props) => {
             dataIndex: 'description',
         },
         {
+            title: '店铺色调',
+            dataIndex: 'mainColor   ',
+            render: (text, record, index) => {
+                return (
+                    <div style={{
+                        'width': '80px',
+                        height: '32px',
+                        background: record.mainColor
+                    }}></div>
+                )
+            }
+        },
+        {
             title: '店铺业务',
             dataIndex: 'businessTypesInfo',
+        },
+        {
+            title: '起送价格',
+            dataIndex: 'deliverPrice',
         },
         {
             title: '店铺操作',
@@ -223,8 +247,8 @@ const Shop = (props) => {
             }
         }
     ];
-    function changeColor(a, b,c) {
-        console.log(a,b,c)
+    function changeColor(a, b, c) {
+        console.log(a, b, c)
     }
     return (
         showCategoryFlag ? <Outlet></Outlet> : <Spin tip="Loading..." spinning={spinning}>
@@ -244,10 +268,10 @@ const Shop = (props) => {
                 <div>店铺列表</div>
                 <Button icon={<PlusOutlined />} type="primary" size="large" onClick={toAddShop}>新增店铺</Button>
             </div> */}
-            <Table style={{ 'marginTop': '30px' }} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.shopID}/>
+            <Table style={{ 'marginTop': '30px' }} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.shopID} />
             {/* {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} />} */}
             {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} > </ShopEdit>}
-        </Spin> 
+        </Spin>
     )
 }
 export default Shop
