@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber, Upload } from 'antd';
+import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber, Upload, Select } from 'antd';
 
 import { UploadOutlined } from '@ant-design/icons';
 import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -74,6 +74,7 @@ const ShopAdd = (props) => {
     function formatShopInfo(values) {
         const positionList = values.positionInfo.split(',')
         const [latitude, longitude] = positionList;
+        values.businessTypesList.sort((a, b) => a - b)
         return {
             shopName: values.shopName,
             startTime: values.startTime.format("HH:mm"),
@@ -88,7 +89,10 @@ const ShopAdd = (props) => {
             location: values.location,
             shopID: props.record.shopID,
             imgUrl: values.imgUrl || '',
-            mainColor: values.mainColor
+            mode: values.mode || 'vertical',
+            mainColor: values.mainColor,
+            deliverPrice: values.deliverPrice,
+            startDeliverPrice: values.startDeliverPrice
         }
     }
     async function addShop(shopInfo) {
@@ -179,7 +183,7 @@ const ShopAdd = (props) => {
         setColorPickerFlag(!colorPickerFlag)
     }
     function onValuesChange(changedValues, allValues) {
-        (changedValues.businessTypesList || []).includes('2') ? setDeliverItemFlag(true) : setDeliverItemFlag(false)
+        (allValues.businessTypesList || []).includes('2') ? setDeliverItemFlag(true) : setDeliverItemFlag(false)
     }
     const ShopInfoForm = (
         <Form
@@ -209,6 +213,17 @@ const ShopAdd = (props) => {
             // initialValue={props.record.description}
             >
                 <Input />
+            </Form.Item>
+            <Form.Item
+                label="店铺模式"
+                name="mode"
+                rules={[{ required: true, message: '请输入店铺简介' }]}
+            // initialValue={props.record.description}
+            >
+                <Select >
+                    <Select.Option value="vertical">垂直</Select.Option>
+                    <Select.Option value="horizontal">水平</Select.Option>
+                </Select>
             </Form.Item>
             <Form.Item
                 label="店铺色调"
@@ -243,13 +258,19 @@ const ShopAdd = (props) => {
                 </Checkbox.Group>
             </Form.Item>
             {
-                deliverItemFlag ? <Form.Item
-                    label="起送价格"
-                    name="deliverPrice">
-                    <InputNumber />
-                </Form.Item> : null
+                deliverItemFlag ?
+                    <Form.Item
+                        label="配送价格"
+                        name="deliverPrice">
+                        <InputNumber />
+                    </Form.Item>
+                    : null
             }
-
+            <Form.Item
+                label="起送价格"
+                name="startDeliverPrice">
+                <InputNumber />
+            </Form.Item>
             <Row >
                 <Col className="gutter-row" span={12}>
                     <Form.Item

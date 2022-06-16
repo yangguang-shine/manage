@@ -56,6 +56,8 @@ const Shop = (props) => {
             const location = item.location
             const positionInfo = `${latitude},${longitude}`
             const description = item.description
+            const mode = item.mode || 'vertical'
+            const modeText = mode === 'vertical' ? '垂直' : '水平';
             const mainColor = item.mainColor
             const businessTypes = item.businessTypes
             const businessTypesList = JSON.parse(item.businessTypes)
@@ -74,7 +76,8 @@ const Shop = (props) => {
                     return str
                 }
             }, '')
-            const deliverPrice = item.deliverPrice || 20
+            const deliverPrice = item.deliverPrice || 0
+            const startDeliverPrice = item.startDeliverPrice || 0
 
             
             return {
@@ -94,11 +97,14 @@ const Shop = (props) => {
                 location,
                 positionInfo,
                 description,
+                mode,
+                modeText,
                 mainColor,
                 businessTypes,
                 businessTypesList,
                 businessTypesInfo,
-                deliverPrice
+                deliverPrice,
+                startDeliverPrice
             }
         })
     }
@@ -213,6 +219,10 @@ const Shop = (props) => {
             dataIndex: 'description',
         },
         {
+            title: '店铺模式',
+            dataIndex: 'modeText',
+        },
+        {
             title: '店铺色调',
             dataIndex: 'mainColor   ',
             render: (text, record, index) => {
@@ -231,6 +241,10 @@ const Shop = (props) => {
         },
         {
             title: '起送价格',
+            dataIndex: 'startDeliverPrice',
+        },
+        {
+            title: '配送费',
             dataIndex: 'deliverPrice',
         },
         {

@@ -21,7 +21,7 @@ export default function useFetch() {
                 method: 'post',
                 data: params
             }).then(async (result) => {
-                await delaySync()
+                // await delaySync()
                 const code = result.data.code
                 const data = result.data.data
                 const msg = result.data.msg
