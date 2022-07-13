@@ -47,7 +47,7 @@ const BatchImport = (props) => {
                             specificationName: attrItem.name,
                             categoryList: (attrItem.values || []).map((valueItem) => {
                                 return {
-                                    specificationDetail:valueItem.value,
+                                    specificationContent:valueItem.value,
                                     specificationPrice: Math.random() > 0.5 ? 1 : 0
                                 }
                             })
