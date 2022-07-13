@@ -1,4 +1,4 @@
-import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber, Upload } from 'antd';
+import { Form, Input, Button, Checkbox, Modal, Row, Col, TimePicker, Space, InputNumber, Upload, Switch } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import useFetch from '@/utils/useFetch';
@@ -27,11 +27,13 @@ export default (props) => {
                 await editCategory({
                     categoryID: props.record.categoryID,
                     shopID: props.record.shopID,
-                    categoryName: values.categoryName
+                    categoryName: values.categoryName,
+                    required: values.required ? 1 : 0
                 })
             } else {
                 await addCategory({
                     categoryName: values.categoryName,
+                    required: values.required ? 1 : 0,
                     shopID: props.record.shopID,
                 })
             }
@@ -65,17 +67,20 @@ export default (props) => {
                 wrapperCol={{
                     span: 20
                 }}
-                initialValues= {
+                initialValues={
                     props.record
                 }
-                >
-        
+            >
+
                 <Form.Item
                     label="分类名称"
                     name="categoryName"
                     rules={[{ required: true, message: '请输入分类名称' }]}>
                     <Input />
 
+                </Form.Item>
+                <Form.Item name="required" label="必选项" valuePropName="checked">
+                    <Switch />
                 </Form.Item>
             </Form>
         </Modal>

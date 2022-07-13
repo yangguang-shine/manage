@@ -4,6 +4,7 @@ import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 // import ShopEdit from './shopEdit';
 import ShopEdit from './ShopEdit';
+import BatchImport from './BatchImport';
 import useFetch from '@/utils/useFetch';
 import { delaySync } from '@/utils/index';
 import './index.less'
@@ -18,7 +19,8 @@ const Shop = (props) => {
     const [record, setRecord] = useState({})
     const [editModalFlag, setEditModalFlag] = useState(false)
     const [spinning, setSpinning] = useState(false)
-    const [showCategoryFlag, setShowCategoryFlag] = useState(false);
+    const [categoryFlag, setCategoryFlag] = useState(false);
+    const [batchImportFlag, setBatchImportFlag] = useState(false);
     const location = useLocation()
     let key = 0;
     async function getShopList() {
@@ -113,10 +115,10 @@ const Shop = (props) => {
         console.log('location   shop')
         const pathname = location.pathname
         if (pathname === '/shop') {
-            setShowCategoryFlag(false)
+            setCategoryFlag(false)
             init()
         } else if (pathname.startsWith('/shop/category')) {
-            setShowCategoryFlag(true)
+            setCategoryFlag(true)
         }
     }, [location])
     async function init() {
@@ -130,14 +132,18 @@ const Shop = (props) => {
         }
     }
     function toShowEditModalFlag(record) {
-        toShowEditModal()
         setRecord(record)
+        toShowEditModal()
     }
     function toShowEditModal() {
         setEditModalFlag(true)
     }
     function toCloseEditModal() {
         setEditModalFlag(false)
+    }
+    function toShowBatchImportFlag(record) {
+        setRecord(record)
+        setBatchImportFlag(true)
     }
     async function toUpdateShopList() {
         try {
@@ -176,7 +182,7 @@ const Shop = (props) => {
     function toCategoryList(record) {
         const { shopID } = record
         navigate(`category?shopID=${shopID}`)
-        setShowCategoryFlag(true)
+        setCategoryFlag(true)
         // history.push({
         //     pathname: '/shop/category',
         //     search: "?shopID=1111",
@@ -256,6 +262,7 @@ const Shop = (props) => {
                         <Tag color="cyan" onClick={() => toCategoryList(record)}>菜品分类</Tag>
                         <Tag color="green" onClick={() => toShowEditModalFlag(record)}>编辑店铺</Tag>
                         <Tag color="red" onClick={() => removeShopConfirmModal(record)}>删除店铺</Tag>
+                        <Tag color="blue" onClick={() => toShowBatchImportFlag(record)}>批量导入</Tag>
                     </Space>
                 )
             }
@@ -265,7 +272,7 @@ const Shop = (props) => {
         console.log(a, b, c)
     }
     return (
-        showCategoryFlag ? <Outlet></Outlet> : <Spin tip="Loading..." spinning={spinning}>
+        categoryFlag ? <Outlet></Outlet> : <Spin tip="Loading..." spinning={spinning}>
             <Row align="middle" justify="center">
                 <Col span={20}>
                     店铺列表
@@ -284,7 +291,10 @@ const Shop = (props) => {
             </div> */}
             <Table style={{ 'marginTop': '30px' }} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.shopID} />
             {/* {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} />} */}
-            {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} > </ShopEdit>}
+            {editModalFlag && <ShopEdit toCloseEditModal={(toCloseEditModal)} toUpdateShopList={toUpdateShopList} record={record} > </ShopEdit>}
+            {
+                <BatchImport visible={batchImportFlag} record={record} confirm={() => setBatchImportFlag(false)} cancel={() => setBatchImportFlag(false)}></BatchImport>
+            }
         </Spin>
     )
 }

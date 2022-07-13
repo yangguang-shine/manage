@@ -59,7 +59,8 @@ const Shop = (props) => {
 
     const toFoodList = (record) => {
         const categoryID = record.categoryID
-        navigate(`food?shopID=${shopID}&categoryID=${categoryID}`)
+        const categoryName = record.categoryName
+        navigate(`food?shopID=${shopID}&categoryID=${categoryID}&categoryName=${categoryName}`)
 
     }
     const toShowEditCategory = (record) => {

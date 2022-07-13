@@ -3,6 +3,7 @@ import { Table, Tag, Popconfirm, Modal, Button, Spin, Space, Row, Col } from 'an
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate,useLocation,  Outlet, useSearchParams } from 'react-router-dom'
 import FoodEdit from './FoodEdit';
+import Test from './Test';
 import useFetch from '@/utils/useFetch';
 import './index.less'
 import { foodImgPath } from '@/config/index'
@@ -14,11 +15,13 @@ const Food = (props) => {
     const [params] = useSearchParams()
     let shopID = params.get('shopID')
     let categoryID = params.get('categoryID')
+    let categoryName = params.get('categoryName')
 
     const [dataSource, setDatasource] = useState([])
     const [record, setRecord] = useState({})
     const [editModalFlag, setEditModalFlag] = useState(false)
     const [spinning, setSpinning] = useState(false)
+    const [testFlag, setTestFlag] = useState(false)
     const location = useLocation()
     let key = 0;
 
@@ -34,7 +37,13 @@ const Food = (props) => {
             categoryID
         })
         // const newDataSource = formatDataSource(res)
-        setDatasource(res || [])
+        const foodList = (res || []).map((foodItem => {
+            return {
+                ...foodItem,
+                specification: JSON.parse(foodItem.specification || '[]')
+            }
+        }))
+        setDatasource(foodList)
     }
     async function removeFood(foodID) {
         await fetch('/manage/food/remove', {
@@ -55,10 +64,12 @@ const Food = (props) => {
     }
     function toShowEditModalFlag(record) {
         toShowEditModal()
+        record.specificationList = []
         setRecord({
             ...record,
             shopID,
-            categoryID
+            categoryID,
+            categoryName
         })
     }
     function toShowEditModal() {
@@ -100,6 +111,9 @@ const Food = (props) => {
             setSpinning(false)
         }
     }
+    function toShowTestFlag() {
+        setTestFlag(true)
+    }
 
 
     function onChange(pagination, filters, sorter, extra) {
@@ -111,7 +125,7 @@ const Food = (props) => {
             dataIndex: 'imgUrl',
             render: (text, record, index) => {
                 return (
-                    <img src={`${foodImgPath}/${record.imgUrl}`} className="shop-img" alt="" />
+                    <img src={`${foodImgPath}/${shopID}/${record.imgUrl}`} className="shop-img" alt="" />
                 )
             }
         },
@@ -148,6 +162,7 @@ const Food = (props) => {
                     <Space>
                         <Tag color="green" onClick={() => toShowEditModalFlag(record)}>编辑菜品</Tag>
                         <Tag color="red" onClick={() => removeFoodConfirmModal(record)}>删除菜品</Tag>
+                        <Tag color="red" onClick={() => toShowTestFlag(record)}>测试菜品</Tag>
                     </Space>
                 )
             }
@@ -170,6 +185,7 @@ const Food = (props) => {
             <Table style={{ 'marginTop': '30px' }} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.foodID}/>
             {/* {editModalFlag && <FoodEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} />} */}
             {editModalFlag && <FoodEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} > </FoodEdit>}
+            {/* <Test></Test> */}
         </Spin> 
     )
 }

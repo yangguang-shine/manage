@@ -11,6 +11,7 @@ import { baseServerUrl } from '@/utils/config.js'
 
 
 import { MinusCircleOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import SkeletonAvatar from 'antd/lib/skeleton/Avatar';
 
 const FoodEdit = (props) => {
     console.log('props:', props)
@@ -23,8 +24,8 @@ const FoodEdit = (props) => {
             {
                 name: '菜品图片',
                 status: 'done',
-                url: `${foodImgPath}/${props.record.imgUrl}`,
-                thumbUrl: `${foodImgPath}/${props.record.imgUrl}`,
+                url: `${foodImgPath}/${props.record.shopID}/${props.record.imgUrl}`,
+                thumbUrl: `${foodImgPath}/${props.record.shopID}/${props.record.imgUrl}`,
             }
         ]
     }
@@ -48,7 +49,10 @@ const FoodEdit = (props) => {
             const values = await form.validateFields();
             console.log('values')
             console.log(values)
-            const foodInfo = values
+            const foodInfo = {
+                ...values,
+                specification: JSON.stringify(values.specification || [])
+            }
             console.log('foodInfo')
             console.log(foodInfo)
             if (props.record.foodID) {
@@ -60,7 +64,7 @@ const FoodEdit = (props) => {
             props.toUpdateShopList()
         } catch (errorInfo) {
             setConfirmLoading(false)
-            console.log('Failed:', errorInfo);
+            console.log('Failed:', errorInfo.values.specificationList);
         } finally {
         }
     };
@@ -70,6 +74,7 @@ const FoodEdit = (props) => {
             ...foodInfo,
             shopID: props.record.shopID,
             categoryID: props.record.categoryID,
+            categoryName: props.record.categoryName,
         })
     }
     async function editFood(foodInfo) {
@@ -96,6 +101,10 @@ const FoodEdit = (props) => {
             }
         }
         return ''
+    }
+    function toAddChildAdd(add) {
+        console.log(1111)
+        console.log(add())
     }
     const foodForm = (
         <Form
@@ -131,12 +140,15 @@ const FoodEdit = (props) => {
             // initialValue={props.record.description}
             >
                 <Input />
+                {/* <Space>
+                    <Input />
+                    <MinusCircleOutlined />
+                </Space> */}
             </Form.Item>
             <Form.Item
                 label="菜品价格"
                 name="price"
                 rules={[{ required: true, message: '请输入店铺名称' }]}
-            // initialValue={props.record.shopName}
             >
                 <InputNumber />
             </Form.Item>
@@ -144,7 +156,6 @@ const FoodEdit = (props) => {
                 label="菜品单位"
                 name="unit"
                 rules={[{ required: true, message: '请输入店铺名称' }]}
-            // initialValue={props.record.shopName}
             >
                 <Input />
             </Form.Item>
@@ -152,7 +163,6 @@ const FoodEdit = (props) => {
                 label="包装价格"
                 name="packPrice"
                 rules={[{ required: true, message: '请输入包装' }]}
-            // initialValue={props.record.shopName}
             >
                 <InputNumber />
             </Form.Item>
@@ -160,7 +170,6 @@ const FoodEdit = (props) => {
                 label="库存数量"
                 name="reserveCount"
                 rules={[{ required: true, message: '请输入库存数量' }]}
-            // initialValue={props.record.shopName}
             >
                 <InputNumber />
             </Form.Item>
@@ -174,11 +183,143 @@ const FoodEdit = (props) => {
                 valuePropName="imgUrl"
                 getValueFromEvent={normFile}
                 rules={[{ required: true, message: '请上传图片' }]}
-            // extra="longgggggggggggggggggggggggggggggggggg"
             >
                 <Upload name="foodImg" action={`${baseServerUrl}/manage/uploadImg/food`} listType="picture" maxCount={1} defaultFileList={[...defaultFileList]}>
                     <Button icon={<UploadOutlined />}>上传店铺图片</Button>
                 </Upload>
+            </Form.Item>
+            <Form.Item
+                label="菜品规格"
+            >
+                <Form.List name='specification'
+                >
+                    {
+                        (fields, { add, remove }, { error }) => (
+                            <Fragment>
+                                {
+                                    fields.map((field, index) => {
+                                        console.log('field')
+                                        console.log(field)
+                                        console.log(fields)
+                                        console.log({ ...field.restField })
+                                        return (
+                                            <div key={field.key}>
+                                                <div>
+                                                    <Space align='baseline'>
+
+                                                        <Form.Item
+                                                            label='规格名称'
+                                                            // name={'name' + index} 
+                                                            name={[field.name, 'specificationName']}
+                                                            labelCol={{
+                                                                span: 8
+                                                            }}
+                                                            wrapperCol={{
+                                                                span: 16
+                                                            }}
+                                                            rules={[{ required: true, message: '请上传图片' }]}
+
+                                                        >
+                                                            <Input />
+                                                        </Form.Item>
+                                                        <MinusCircleOutlined onClick={() => remove(field.name)} />
+                                                    </Space>
+
+                                                </div>
+                                                <Form.List key={field.key} name={[field.name, 'categoryList']}
+                                                >
+                                                    {
+                                                        (fields1, { add: childAdd, remove: childRemove }, { error }) => {
+                                                            if (!fields1.length) {
+                                                                setTimeout(() => {
+                                                                    childAdd()
+                                                                }, 100);
+                                                                // return null
+                                                            }
+                                                            return (
+                                                                <div key={field.key}>
+                                                                    {
+                                                                        fields1.length > 0 ?
+                                                                            <Row >
+                                                                                {
+                                                                                    fields1.map((field1, index) => {
+                                                                                        console.log('field1')
+                                                                                        console.log(field1)
+                                                                                        return (
+                                                                                            <Row key={field1.key}>
+                                                                                                <Col offset={6} key={field1.key} span={10}>
+                                                                                                    <Form.Item
+                                                                                                        label='分类名称' name={[field1.name, 'specificationDetail']}
+                                                                                                        labelCol={{
+                                                                                                            span: 12
+                                                                                                        }}
+                                                                                                        wrapperCol={{
+                                                                                                            span: 10
+                                                                                                        }}
+                                                                                                        rules={[{ required: true, message: '请上传图片' }]}
+
+                                                                                                    >
+                                                                                                        <Input />
+                                                                                                    </Form.Item>
+                                                                                                </Col>
+                                                                                                <Col span={8}>
+                                                                                                    <Space align="baseline">
+
+                                                                                                        <Form.Item
+                                                                                                            label='加价' name={[field1.name, 'specificationPrice']}
+
+                                                                                                            labelCol={{
+                                                                                                                span: 12
+                                                                                                            }}
+                                                                                                            wrapperCol={{
+                                                                                                                span: 12
+                                                                                                            }}
+                                                                                                            rules={[{ required: true, message: '请上传图片' }]}
+
+                                                                                                        >
+                                                                                                            <InputNumber />
+                                                                                                        </Form.Item>
+                                                                                                        <MinusCircleOutlined onClick={() => childRemove(field1.name)} />
+                                                                                                    </Space>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                            </Row> : null
+                                                                    }
+                                                                    <Row style={{ 'marginBottom': '30px' }}>
+                                                                        <Col offset={6} span={10}>
+                                                                            <Space align='baseline'>
+                                                                                <Button type="dashed" onClick={() => childAdd()} block icon={<PlusOutlined />}>
+                                                                                    添加分类
+                                                                                </Button>
+                                                                            </Space>
+                                                                        </Col>
+
+                                                                    </Row>
+
+                                                                </div>
+                                                            )
+                                                        }
+                                                    }
+                                                </Form.List>
+                                            </div>
+
+                                        )
+                                    })
+                                }
+                                <Form.Item>
+                                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                        添加规格
+                                    </Button>
+                                </Form.Item>
+                            </Fragment>
+                        )
+                    }
+                </Form.List>
+
             </Form.Item>
         </Form>
     )

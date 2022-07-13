@@ -21,7 +21,7 @@ const ShopAdd = (props) => {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [color, setColor] = useState(props.record.mainColor || '#EB0808');
     const [colorPickerFlag, setColorPickerFlag] = useState(false);
-    const [deliverItemFlag, setDeliverItemFlag] = useState(props.record.businessTypesList.includes('2') ? true : false);
+    const [deliverItemFlag, setDeliverItemFlag] = useState((props.record.businessTypesList || []).includes('2') ? true : false);
 
     const defaultFileList = [
         {
