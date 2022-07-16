@@ -70,22 +70,35 @@ const Shop = (props) => {
         })
         setShowEditCategoryFlag(true)
     }
-    function removeCategoryConfirmModal(record) {
+
+    function removeAllCategoryConfirmModal(record) {
+        const categoryIDList = dataSource.map((item) => item.categoryID)
         Modal.confirm({
             title: '提示',
             icon: <ExclamationCircleOutlined />,
-            content: '是否删除改店铺和店铺下的所有菜品',
+            content: '是否删除该店铺下的所有分类以及菜品',
             okText: '删除',
             cancelText: '取消',
-            onOk: () => toRemoveCategory(record.categoryID)
+            onOk: () => toRemoveCategory(categoryIDList)
         });
     }
-    async function toRemoveCategory(categoryID) {
+    function removeCategoryConfirmModal(record) {
+        const categoryIDList = [record.categoryID]
+        Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined />,
+            content: '是否删除该分类的的所有菜品',
+            okText: '删除',
+            cancelText: '取消',
+            onOk: () => toRemoveCategory(categoryIDList)
+        });
+    }
+    async function toRemoveCategory(categoryIDList) {
         try {
            setSpinning(true)
            await fetch('/manage/category/remove', {
                shopID,
-               categoryID
+               categoryIDList
            })
            init()
         } catch(e) {
@@ -128,14 +141,22 @@ const Shop = (props) => {
         toCloseEditModal()
         await init()
     }
+
+
+
     return showFoodListFlag ? <Outlet></Outlet> :
         <Spin spinning={spinning}>
             <Row align="middle" justify="center">
-                <Col span={20}>
+                <Col span={16}>
                     店铺分类列表
                 </Col>
                 <Col span={4}>
                     <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditCategory({})}>新增分类</Button>
+              
+
+                </Col>
+                <Col span={4}>
+                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => removeAllCategoryConfirmModal({})}>删除全部分类</Button>
                 </Col>
             </Row>
             <Table columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.categoryID}/>

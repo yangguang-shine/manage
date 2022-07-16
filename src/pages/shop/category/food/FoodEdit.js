@@ -210,7 +210,7 @@ const FoodEdit = (props) => {
                                                         <Form.Item
                                                             label='规格名称'
                                                             // name={'name' + index} 
-                                                            name={[field.name, 'specificationName']}
+                                                            name={[field.name, 'name']}
                                                             labelCol={{
                                                                 span: 8
                                                             }}
@@ -249,7 +249,7 @@ const FoodEdit = (props) => {
                                                                                             <Row key={field1.key}>
                                                                                                 <Col offset={6} key={field1.key} span={10}>
                                                                                                     <Form.Item
-                                                                                                        label='分类名称' name={[field1.name, 'specificationDetail']}
+                                                                                                        label='分类名称' name={[field1.name, 'content']}
                                                                                                         labelCol={{
                                                                                                             span: 12
                                                                                                         }}
@@ -266,7 +266,7 @@ const FoodEdit = (props) => {
                                                                                                     <Space align="baseline">
 
                                                                                                         <Form.Item
-                                                                                                            label='加价' name={[field1.name, 'specificationPrice']}
+                                                                                                            label='加价' name={[field1.name, 'price']}
 
                                                                                                             labelCol={{
                                                                                                                 span: 12

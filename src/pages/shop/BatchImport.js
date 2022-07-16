@@ -10,13 +10,6 @@ import { SketchPicker } from 'react-color'
 import './ShopEdit.less';
 
 const { TextArea } = Input;
-
-
-
-// import './shopEdit.less'
-
-
-
 const BatchImport = (props) => {
     console.log('props')
     console.log(props)
@@ -38,21 +31,25 @@ const BatchImport = (props) => {
                 const categoryItem = {}
                 categoryItem.shopID = props.record.shopID
                 categoryItem.categoryName = categoryItemOrigin.name
-
-     
                 categoryItem.foodList = categoryItemOrigin.spus.map((foodItemOrigin) => {
-                    const specification = [];
-                    (foodItemOrigin.attrs || []).forEach((attrItem) => {
-                        specification.push({
-                            specificationName: attrItem.name,
-                            categoryList: (attrItem.values || []).map((valueItem) => {
-                                return {
-                                    specificationContent:valueItem.value,
-                                    specificationPrice: Math.random() > 0.5 ? 1 : 0
-                                }
+                    let specification = [];
+                    try {
+                        if (foodItemOrigin.attrs.length > 1 || foodItemOrigin.attrs[0].values.length > 1) {
+                            (foodItemOrigin.attrs || []).forEach((attrItem) => {
+                                specification.push({
+                                    name: attrItem.name,
+                                    categoryList: (attrItem.values || []).map((valueItem) => {
+                                        return {
+                                            content:valueItem.value,
+                                            price: Math.floor(Math.random()*3)
+                                        }
+                                    })
+                                })
                             })
-                        })
-                    })
+                        }
+                    } catch (error) {
+                        specification = []
+                    }
                     const foodItem = {
                         foodName: foodItemOrigin.name,
                         categoryName: categoryItemOrigin.name,
@@ -72,6 +69,7 @@ const BatchImport = (props) => {
             })
             console.log('categoryList')
             console.log(categoryList)
+            // return 
             const res = await fetch('/manage/shop/bulkImportFood', {
                 shopID: props.record.shopID,
                 categoryList
@@ -81,11 +79,7 @@ const BatchImport = (props) => {
             // props.confirm()
         } catch (e) {
             console.log(e)
-
         }
-
-        // props.confirm()
-
     }
     function handleInputData() {
 
