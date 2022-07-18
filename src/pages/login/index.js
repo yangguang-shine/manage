@@ -16,7 +16,7 @@ export default () => {
                 phone: values.username,
                 password: values.password
             })
-            navigate('/home', {
+            navigate('/shop', {
                 replace: true
             })
         } catch (error) {

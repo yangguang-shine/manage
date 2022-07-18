@@ -247,7 +247,7 @@ const FoodEdit = (props) => {
                                                                                         console.log(field1)
                                                                                         return (
                                                                                             <Row key={field1.key}>
-                                                                                                <Col offset={6} key={field1.key} span={10}>
+                                                                                                <Col offset={2} key={field1.key} span={10}>
                                                                                                     <Form.Item
                                                                                                         label='分类名称' name={[field1.name, 'content']}
                                                                                                         labelCol={{
@@ -256,7 +256,7 @@ const FoodEdit = (props) => {
                                                                                                         wrapperCol={{
                                                                                                             span: 10
                                                                                                         }}
-                                                                                                        rules={[{ required: true, message: '请上传图片' }]}
+                                                                                                        rules={[{ required: true, message: '请输入分类' }]}
 
                                                                                                     >
                                                                                                         <Input />
@@ -269,17 +269,17 @@ const FoodEdit = (props) => {
                                                                                                             label='加价' name={[field1.name, 'price']}
 
                                                                                                             labelCol={{
-                                                                                                                span: 12
+                                                                                                                span: 14
                                                                                                             }}
                                                                                                             wrapperCol={{
-                                                                                                                span: 12
+                                                                                                                span: 10
                                                                                                             }}
-                                                                                                            rules={[{ required: true, message: '请上传图片' }]}
+                                                                                                            rules={[{ required: true, message: '请输入正确数字' }]}
 
                                                                                                         >
-                                                                                                            <InputNumber />
+                                                                                                            <InputNumber/>
                                                                                                         </Form.Item>
-                                                                                                        <MinusCircleOutlined onClick={() => childRemove(field1.name)} />
+                                                                                                        <MinusCircleOutlined style={{'marginLeft': '50px'}} onClick={() => childRemove(field1.name)} />
                                                                                                     </Space>
                                                                                                 </Col>
                                                                                             </Row>

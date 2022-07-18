@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Menu from './pages/menu/index'
-import Home from './pages/home/index'
+import Upload from './pages/upload/index'
 import Shop from './pages/shop/index'
 import Category from './pages/shop/category/index'
 import Food from './pages/shop/category/food/index'
@@ -24,7 +24,7 @@ export default class App extends React.Component {
                     <Route path="/" element={<Menu></Menu>}>
                         <Route path='login' element={<Login></Login>}></Route>
                         <Route path='register' element={<Register></Register>}></Route>
-                        <Route path='home' element={<Home></Home>}></Route>
+                        <Route path='upload' element={<Upload></Upload>}></Route>
                         <Route path='shop' element={<Shop></Shop>}>
                             <Route path='category' element={<Category></Category>}>
                                 <Route path="food" element={<Food></Food>}></Route>
@@ -33,7 +33,7 @@ export default class App extends React.Component {
                         <Route path='order' element={<Shop></Shop>}>
                         </Route>
                     </Route>
-                    <Route path="*" element={<Navigate to='/home' replace></Navigate>} />
+                    <Route path="*" element={<Navigate to='/shop' replace></Navigate>} />
                 </Routes>
             </BrowserRouter>
         )

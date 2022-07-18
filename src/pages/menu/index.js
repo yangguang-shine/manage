@@ -18,7 +18,7 @@ const BaseLayout = props => {
     useEffect(() => {
         console.log('>>>>>>>>>>>>>>>>')
         if (location.pathname === '/') {
-            navigate('/home', { replace: true })
+            navigate('/shop', { replace: true })
         }
         if (location.pathname.startsWith('/shop')) {
             setOpenKeys(['sub_shop'])
@@ -52,8 +52,8 @@ const BaseLayout = props => {
                     <Item key="/register">
                         <Link to={"register"}>register</Link>
                     </Item>
-                    <Item key="/home">
-                        <Link to={"home"}>home</Link>
+                    <Item key="/upload">
+                        <Link to={"upload"}>upload</Link>
                     </Item>
                     <SubMenu key="sub_shop" title="sub_shop">
                         <Item key="/shop">
