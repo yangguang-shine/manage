@@ -12,17 +12,15 @@ import { SketchPicker } from 'react-color'
 import './ShopEdit.less';
 
 // import './shopEdit.less'
-
 const ShopAdd = (props) => {
     console.log('props.record.mainColor')
     console.log(props.record.mainColor)
     const fetch = useFetch()
     const [form] = Form.useForm();
     const [confirmLoading, setConfirmLoading] = useState(false);
-    const [color, setColor] = useState(props.record.mainColor || '#EB0808');
+    const [color, setColor] = useState(props.record.mainColor);
     const [colorPickerFlag, setColorPickerFlag] = useState(false);
     const [deliverItemFlag, setDeliverItemFlag] = useState((props.record.businessTypesList || []).includes('2') ? true : false);
-
     const defaultFileList = [
         {
             name: '店铺图片',
@@ -72,8 +70,8 @@ const ShopAdd = (props) => {
         }
     };
     function formatShopInfo(values) {
-        const positionList = values.positionInfo.split(',')
-        const [latitude, longitude] = positionList;
+        // const positionList = values.positionInfo.split(',')
+        // const [latitude, longitude] = positionList;
         values.businessTypesList.sort((a, b) => a - b)
         return {
             shopName: values.shopName,
@@ -84,14 +82,14 @@ const ShopAdd = (props) => {
             businessTypes: JSON.stringify(values.businessTypesList),
             minus: JSON.stringify(values.minusList || []),
             shopName: values.shopName,
-            latitude,
-            longitude,
-            location: values.location,
+            latitude: '111',
+            longitude: '222',
+            location: '北京市大兴区西三路',
             shopID: props.record.shopID,
             imgUrl: values.imgUrl || '',
             mode: values.mode || 'vertical',
             mainColor: values.mainColor,
-            deliverPrice: values.deliverPrice,
+            deliverPrice: values.deliverPrice || 0,
             startDeliverPrice: values.startDeliverPrice
         }
     }
@@ -294,7 +292,7 @@ const ShopAdd = (props) => {
                     </Form.Item>
                 </Col>
             </Row>
-            <Row>
+            {/* <Row>
                 <Col span={16}>
                     <Form.Item
                         labelCol={{
@@ -313,10 +311,10 @@ const ShopAdd = (props) => {
                 <Col span={8}>
                     <Button onClick={toGetAddress}>去获取坐标信息</Button>
                 </Col>
-            </Row>
+            </Row> */}
 
 
-            <Row>
+            {/* <Row>
                 <Col span={16}>
                     <Form.Item
                         labelCol={{
@@ -335,7 +333,7 @@ const ShopAdd = (props) => {
                 <Col span={8}>
                     <Button>去获取店铺地址</Button>
                 </Col>
-            </Row>
+            </Row> */}
             <Form.Item
                 label="详细地址"
                 name="address"

@@ -271,6 +271,8 @@ const Shop = (props) => {
     function changeColor(a, b, c) {
         console.log(a, b, c)
     }
+const defaultColor = '#4EB5F7'
+
     return (
         categoryFlag ? <Outlet></Outlet> : <Spin tip="Loading..." spinning={spinning}>
             <Row align="middle" justify="center">
@@ -278,7 +280,9 @@ const Shop = (props) => {
                     店铺列表
                 </Col>
                 <Col span={4}>
-                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditModalFlag({})}>新增店铺</Button>
+                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditModalFlag({
+                        mainColor: defaultColor
+                    })}>新增店铺</Button>
                 </Col>
             </Row>
             <div>
