@@ -17,14 +17,18 @@ const BaseLayout = props => {
     const [selectedKeys, setSelectedKeys] = useState([])
     useEffect(() => {
         console.log('>>>>>>>>>>>>>>>>')
-        if (location.pathname === '/') {
+        if (location.pathname === '/manage') {
             navigate('/shop', { replace: true })
         }
-        if (location.pathname.startsWith('/shop')) {
+        if (location.pathname.startsWith('/manage/shop')) {
             setOpenKeys(['sub_shop'])
             setSelectedKeys(['/shop'])
         } else {
-            setSelectedKeys([location.pathname])
+            console.log('location.pathname')
+            console.log(location.pathname)
+            setSelectedKeys([location.pathname.replace('/manage', '')])
+            // setOpenKeys(['sub_shop'])
+            // setSelectedKeys(['/shop'])
         }
         // setSelectKeys([location.pathname])
     }, [location])
@@ -59,16 +63,16 @@ const BaseLayout = props => {
                         <Item key="/shop">
                             <Link to={"shop"}>shop</Link>
                         </Item>
-                        <Item key="/order">
+                        {/* <Item key="/order">
                             <Link to={"order"}>order</Link>
-                        </Item>
+                        </Item> */}
                     </SubMenu>
-                    <SubMenu key="test" title="Navigation One">
+                    {/* <SubMenu key="test" title="Navigation One">
                         <Menu.Item key="test1">test1</Menu.Item>
                         <Menu.Item key="test2">test2</Menu.Item>
                         <Menu.Item key="test3">test3</Menu.Item>
                         <Menu.Item key="test4">test4</Menu.Item>
-                    </SubMenu>
+                    </SubMenu> */}
                 </Menu>
             </Sider>
             <Content className="main-content"><Outlet /></Content>

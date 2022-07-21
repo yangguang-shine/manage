@@ -136,7 +136,7 @@ const FoodEdit = (props) => {
             <Form.Item
                 label="菜品描述"
                 name="description"
-                rules={[{ required: true, message: '请输入店铺简介' }]}
+                rules={[{ required: true, message: '请输入店铺描述' }]}
             // initialValue={props.record.description}
             >
                 <Input />
@@ -148,21 +148,21 @@ const FoodEdit = (props) => {
             <Form.Item
                 label="菜品价格"
                 name="price"
-                rules={[{ required: true, message: '请输入店铺名称' }]}
+                rules={[{ required: true, message: '请输入菜品价格' }]}
             >
                 <InputNumber />
             </Form.Item>
             <Form.Item
                 label="菜品单位"
                 name="unit"
-                rules={[{ required: true, message: '请输入店铺名称' }]}
+                rules={[{ required: true, message: '请输入菜品单位' }]}
             >
                 <Input />
             </Form.Item>
             <Form.Item
                 label="包装价格"
                 name="packPrice"
-                rules={[{ required: true, message: '请输入包装' }]}
+                rules={[{ required: true, message: '请输入包装价格' }]}
             >
                 <InputNumber />
             </Form.Item>
@@ -217,7 +217,7 @@ const FoodEdit = (props) => {
                                                             wrapperCol={{
                                                                 span: 16
                                                             }}
-                                                            rules={[{ required: true, message: '请上传图片' }]}
+                                                            rules={[{ required: true, message: '请输入规格' }]}
 
                                                         >
                                                             <Input />

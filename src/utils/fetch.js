@@ -2,7 +2,15 @@ import axios from 'axios';
 import { useNavigate, withRouter } from 'react-router-dom'
 import { delaySync } from '@/utils/index'
 import { message} from 'antd'
-export const baseURL = 'http://dev.jr.jd.com:7777/api'
+
+export let baseURL = 'http://dev.jr.jd.com:9999/api'
+if (process.env.NODE_ENV === 'development') {
+    console.log('线上环境')
+     baseURL = 'http://dev.jr.jd.com:7777/api'
+} else {
+    console.log('开发环境')
+
+}
 // http://dev.jr.jd.com:7777/api/user/address/list
 axios.defaults.baseURL = baseURL;
 export default withRouter(function ferch (url, params, options = {}){

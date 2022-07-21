@@ -21,7 +21,7 @@ export default class App extends React.Component {
         return (
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<Menu></Menu>}>
+                    <Route path="/manage" element={<Menu></Menu>}>
                         <Route path='login' element={<Login></Login>}></Route>
                         <Route path='register' element={<Register></Register>}></Route>
                         <Route path='upload' element={<Upload></Upload>}></Route>
@@ -30,10 +30,10 @@ export default class App extends React.Component {
                                 <Route path="food" element={<Food></Food>}></Route>
                             </Route>
                         </Route>
-                        <Route path='order' element={<Shop></Shop>}>
-                        </Route>
+                        {/* <Route path='order' element={<Shop></Shop>}>
+                        </Route> */}
                     </Route>
-                    <Route path="*" element={<Navigate to='/shop' replace></Navigate>} />
+                    <Route path="*" element={<Navigate to='/manage/shop' replace></Navigate>} />
                 </Routes>
             </BrowserRouter>
         )

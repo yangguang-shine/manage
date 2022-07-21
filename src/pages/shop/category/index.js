@@ -22,10 +22,10 @@ const Shop = (props) => {
     useEffect(() => {
         const pathname = location.pathname
         shopID = params.get('shopID')
-        if (pathname === '/shop/category') {
+        if (pathname === '/manage/shop/category') {
             setShowFoodListFlag(false)
             init()
-        } else if (pathname.startsWith('/shop/category/food')) {
+        } else if (pathname.startsWith('/manage/shop/category/food')) {
             setShowFoodListFlag(true)
         }
     }, [location]);

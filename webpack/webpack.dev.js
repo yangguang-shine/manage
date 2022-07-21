@@ -9,10 +9,16 @@ const developmentConfig = merge(CommonConfig, {
     devServer: {
         port: 7777, // 自定义修改8888端口,
         static: {
-            directory: path.join(__dirname, '/dist'),
+            directory: path.join(__dirname, '../dist/manage'),
+            publicPath: '/manage/'
         },
         hot: true,
-        historyApiFallback: true,
+        historyApiFallback: {
+            rewrites: [
+                { from: /^\/$/, to: '/manage/' },
+                { from: /^\/manage/, to: '/manage/' },
+              ]
+        },
         open: true,
         host: "dev.jr.jd.com",
         // 代理跨域
@@ -25,6 +31,7 @@ const developmentConfig = merge(CommonConfig, {
     },
     // 使用开发模式
     mode: 'development',
+    // devtool: 'source-map',
     // 开发环境 loader 处理
     module: {
         rules: [

@@ -1,9 +1,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const HappyPack = require('happypack')
 const webpack = require('webpack')
 // 构造出共享进程池，在进程池中包含5个子进程
-const HappyPackThreadPool = HappyPack.ThreadPool({ size: 5 })
 
 module.exports = {
 
@@ -14,9 +12,9 @@ module.exports = {
     },
     // webpack 编译出口
     output: {
-        path: path.join(__dirname, '../dist'),
+        path: path.join(__dirname, '../dist/manage',),
         filename: '[name][id].js',
-        publicPath: '/'
+        publicPath: '/manage'
     },
     // webpack 模块处理
     module: {

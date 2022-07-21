@@ -114,10 +114,10 @@ const Shop = (props) => {
         // location.pathname.startsWith('/shop')
         console.log('location   shop')
         const pathname = location.pathname
-        if (pathname === '/shop') {
+        if (pathname === '/manage/shop') {
             setCategoryFlag(false)
             init()
-        } else if (pathname.startsWith('/shop/category')) {
+        } else if (pathname.startsWith('/manage/shop/category')) {
             setCategoryFlag(true)
         }
     }, [location])
