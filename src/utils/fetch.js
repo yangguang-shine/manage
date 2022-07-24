@@ -3,7 +3,7 @@ import { useNavigate, withRouter } from 'react-router-dom'
 import { delaySync } from '@/utils/index'
 import { message} from 'antd'
 
-export let baseURL = 'http://dev.jr.jd.com:9999/api'
+export let baseURL = `${window.location.origin}/api`
 if (process.env.NODE_ENV === 'development') {
     console.log('线上环境')
      baseURL = 'http://dev.jr.jd.com:7777/api'
