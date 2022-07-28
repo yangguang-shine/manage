@@ -1,305 +1,159 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { Table, Tag, Popconfirm, Modal, Button, Spin, Space, Row, Col } from 'antd';
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom'
-// import ShopEdit from './shopEdit';
-import ShopEdit from './ShopEdit';
-import BatchImport from './BatchImport';
-import useFetch from '@/utils/useFetch';
-import { delaySync } from '@/utils/index';
+import { Button, Tabs, } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
 import './index.less'
-import { shopImgPath } from '@/config/index'
+import Shop from '../shop/index copy'
+import Category from './category'
+import Food from './category/food'
+const { TabPane } = Tabs;
+import { useNavigate, useLocation, Outlet, Routes, Route, useParams } from 'react-router-dom'
+// const defaultPanes = Array.from({ length: 2 }).map((_, index) => {
+//     const id = String(index + 1);
+//     return { title: `Tab ${id}`, content: `Content of Tab Pane ${index + 1}`, key: id };
+// });
 
-import { ChromePicker } from 'react-color'
 
-const Shop = (props) => {
+
+const App = () => {
+    console.log(3333333333)
     const navigate = useNavigate()
-    const fetch = useFetch()
-    const [dataSource, setDatasource] = useState([])
-    const [record, setRecord] = useState({})
-    const [editModalFlag, setEditModalFlag] = useState(false)
-    const [spinning, setSpinning] = useState(false)
-    const [categoryFlag, setCategoryFlag] = useState(false);
-    const [batchImportFlag, setBatchImportFlag] = useState(false);
     const location = useLocation()
-    let key = 0;
-    async function getShopList() {
-        const res = await fetch('/manage/shop/list')
-        // res.shift()
-        const newDataSource = formatDataSource(res)
-        setDatasource(newDataSource)
+    const [activeKey, setActiveKey] = useState('0');
+    const [panes, setPanes] = useState([]);
+    const newTabIndex = useRef(0);
+    const currentPanes = useRef(panes)
+    const onChange = (key) => {
+        setActiveKey(key);
+    };
+    const params = useParams()
+    const [shopID, setShopID] = useState(params.shopID || 0);
+    const [categoryID, setCategoryID] = useState(params.categoryID || 0);
+    const [categoryName, setCategoryName] = useState(params.categoryName || '');
+    const ShopComponent = <Shop toCategoryList={toCategoryList} />
+    const CategoryComponent = <Category toFoodList={toFoodList} shopID={shopID} />
+    const FoodComponent = <Food toFoodList={toFoodList} shopID={shopID} categoryID={categoryID} categoryName={categoryName} />
+    function toFoodList(record) {
+        console.log(record)
+        setShopID(record.shopID)
+        setCategoryID(record.categoryID)
+        setCategoryName(record.categoryName)
+        const newActiveKey = getNewKey()
+        const newPanes = [
+            ...panes, { title: record.categoryName, content: 'FoodComponent', key: newActiveKey }
+        ]
+        setPanes(newPanes)
+        setActiveKey(newActiveKey);
     }
-    async function removeShop(shopID) {
-        await fetch('/manage/shop/remove', {
-            shopID
-        });
+    function toCategoryList(record) {
+        // location.pathname = '/manage/shop/category'
+        // console.log('location.pathname')
+        // console.log(location.pathname)
+        navigate('/manage/shop/category')
+        setShopID(record.shopID)
+        const newActiveKey = getNewKey()
+        const newPanes = [
+            ...panes, { title: record.shopName, content: 'CategoryComponent', key: newActiveKey }
+        ]
+        setPanes(newPanes)
+        setActiveKey(newActiveKey);
     }
-    function formatDataSource(list = []) {
-        return list.map((item) => {
-            // item.minus = JSON.stringify([])
-            // item.businessTypes = JSON.stringify([])
-            key++;
-            const shopID = item.shopID
-            const imgUrl = item.imgUrl || ''
-            const shopName = item.shopName
-            const startTime = item.startTime
-            const endTime = item.endTime
-            const openTiming = `${item.startTime}-${item.endTime}`
-            const minus = item.minus
-            const minusList = JSON.parse(item.minus)
-            const minusInfo = minusList.reduce((str, item) => {
-                const reach = item.reach
-                const reduce = item.reduce
-                return str ? `${str},满${reach}减${reduce}` : `满${reach}减${reduce}`
-            }, '')
-            const address = item.address
-            const latitude = item.latitude
-            const longitude = item.longitude
-            const location = item.location
-            const positionInfo = `${latitude},${longitude}`
-            const description = item.description
-            const mode = item.mode || 'vertical'
-            const modeText = mode === 'vertical' ? '垂直' : '水平';
-            const mainColor = item.mainColor
-            const businessTypes = item.businessTypes
-            const businessTypesList = JSON.parse(item.businessTypes)
-            const businessTypesInfo = businessTypesList.reduce((str, item) => {
-                let type = ''
-                if (+item === 1) {
-                    type = '堂食'
-                } else if (+item === 2) {
-                    type = '外卖'
-                } else if (+item === 3) {
-                    type = '自提'
-                }
-                if (type) {
-                    return str ? `${str},${type}` : `${type}`
-                } else {
-                    return str
-                }
-            }, '')
-            const deliverPrice = item.deliverPrice || 0
-            const startDeliverPrice = item.startDeliverPrice || 0
-
-            
-            return {
-                key,
-                shopID,
-                imgUrl,
-                shopName,
-                openTiming,
-                startTime,
-                endTime,
-                minus,
-                minusList,
-                minusInfo,
-                address,
-                latitude,
-                longitude,
-                location,
-                positionInfo,
-                description,
-                mode,
-                modeText,
-                mainColor,
-                businessTypes,
-                businessTypesList,
-                businessTypesInfo,
-                deliverPrice,
-                startDeliverPrice
-            }
-        })
+    function getNewKey() {
+        newTabIndex.current += 1
+        return `${newTabIndex.current}`
     }
     useEffect(() => {
-        // location.pathname.startsWith('/shop')
-        console.log('location   shop')
+        console.log('hkjdhfiukdshiufkdsahui')
         const pathname = location.pathname
-        if (pathname === '/manage/shop') {
-            setCategoryFlag(false)
-            init()
+        if (pathname.startsWith('/manage/shop/category/food')) {
+            setPanes([
+                {
+                    title: `food`,
+                    info: {
+                        componentName: 'FoodComponent',
+                        pathname: `/manage/shop/category/food?shopID=${shopID}&categotyID=${categotyID}&categoryName=${categoryName}`
+                    },
+                    key: '0'
+                }
+            ])
         } else if (pathname.startsWith('/manage/shop/category')) {
-            setCategoryFlag(true)
-        }
-    }, [location])
-    async function init() {
-        try {
-            setSpinning(true)
-            await getShopList()
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setSpinning(false)
-        }
-    }
-    function toShowEditModalFlag(record) {
-        setRecord(record)
-        toShowEditModal()
-    }
-    function toShowEditModal() {
-        setEditModalFlag(true)
-    }
-    function toCloseEditModal() {
-        setEditModalFlag(false)
-    }
-    function toShowBatchImportFlag(record) {
-        setRecord(record)
-        setBatchImportFlag(true)
-    }
-    async function toUpdateShopList() {
-        try {
-            toCloseEditModal()
-            setSpinning(true)
-            await getShopList()
-        } catch (error) {
-            console.log('error')
-            console.log(error)
-        } finally {
-            setSpinning(false)
-        }
-    }
-    function removeShopConfirmModal(record) {
-        Modal.confirm({
-            title: '提示',
-            icon: <ExclamationCircleOutlined />,
-            content: '是否删除改店铺和店铺下的所有菜品',
-            okText: '删除',
-            cancelText: '取消',
-            onOk: () => toRemoveShop(record.shopID)
-        });
-    }
-    async function toRemoveShop(shopID) {
-        try {
-            setSpinning(true)
-            await removeShop(shopID)
-            await getShopList()
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setSpinning(false)
-        }
-    }
+            setPanes([
+                {
+                    title: `category`,
+                    info: {
+                        componentName: 'CategotyComponent',
+                        pathname: `/manage/shop/category?shopID=${shopID}`
+                    },
+                    key: '0'
+                }
+                // { title: `category`, content: <Category />, key: '0' }
+            ])
+        } else if (pathname.startsWith('/manage/shop')) {
+            setPanes([
+                {
+                    title: `shop`, info: {
+                        componentName: 'ShopComponent',
+                        pathname: `/manage/shop`
+                    }, key: '0'
+                }
 
-    function toCategoryList(record) {
-        const { shopID } = record
-        navigate(`category?shopID=${shopID}`)
-        setCategoryFlag(true)
-        // history.push({
-        //     pathname: '/shop/category',
-        //     search: "?shopID=1111",
-        // })
-    }
-
-
-    function onChange(pagination, filters, sorter, extra) {
-        console.log('params', pagination, filters, sorter, extra);
-    }
-    const columns = [
-        {
-            title: '店铺图片',
-            dataIndex: 'imgUrl',
-            render: (text, record, index) => {
-                return (
-                    <img src={`${shopImgPath}/${record.imgUrl}`} className="shop-img" alt="" />
-                )
-            }
-        },
-        {
-            title: '店铺名称',
-            dataIndex: 'shopName',
-
-        },
-        {
-            title: '营业时间',
-            dataIndex: 'openTiming',
-        },
-        {
-            title: '店铺满减',
-            dataIndex: 'minusInfo',
-        },
-        {
-            title: '店铺地址',
-            dataIndex: 'address',
-        },
-        {
-            title: '店铺简介',
-            dataIndex: 'description',
-        },
-        {
-            title: '店铺模式',
-            dataIndex: 'modeText',
-        },
-        {
-            title: '店铺色调',
-            dataIndex: 'mainColor   ',
-            render: (text, record, index) => {
-                return (
-                    <div style={{
-                        'width': '80px',
-                        height: '32px',
-                        background: record.mainColor
-                    }}></div>
-                )
-            }
-        },
-        {
-            title: '店铺业务',
-            dataIndex: 'businessTypesInfo',
-        },
-        {
-            title: '起送价格',
-            dataIndex: 'startDeliverPrice',
-        },
-        {
-            title: '配送费',
-            dataIndex: 'deliverPrice',
-        },
-        {
-            title: '店铺操作',
-            dataIndex: 'shopOperate',
-            render: (text, record, index) => {
-                return (
-                    <Space>
-                        <Tag color="cyan" onClick={() => toCategoryList(record)}>菜品分类</Tag>
-                        <Tag color="green" onClick={() => toShowEditModalFlag(record)}>编辑店铺</Tag>
-                        <Tag color="red" onClick={() => removeShopConfirmModal(record)}>删除店铺</Tag>
-                        <Tag color="blue" onClick={() => toShowBatchImportFlag(record)}>批量导入</Tag>
-                    </Space>
-                )
-            }
+            ])
+        } else {
+            console.log(111)
         }
-    ];
-    function changeColor(a, b, c) {
-        console.log(a, b, c)
-    }
-const defaultColor = '#4EB5F7'
+    }, []);
 
+    // const add = () => {
+    //     const newActiveKey = `newTab${newTabIndex.current++}`;
+    //     setPanes([...panes, { title: 'New Tab', content: 'New Tab Pane', key: newActiveKey }]);
+    //     setActiveKey(newActiveKey);
+    // };
+
+    const remove = (targetKey) => {
+        const targetIndex = panes.findIndex(pane => pane.key === targetKey);
+        const newPanes = panes.filter(pane => pane.key !== targetKey);
+        if (newPanes.length && targetKey === activeKey) {
+            const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+            setActiveKey(key);
+        }
+        console.log('remove')
+        setPanes(newPanes);
+    };
+
+    function onEdit(targetKey, action) {
+        console.log('onEdit')
+        console.log(targetKey, action)
+        if (action === 'add') {
+            add();
+        } else {
+            remove(targetKey);
+        }
+    };
+    function onTabClick(key, event) {
+        console.log('onTabClick')
+        console.log(key)
+    }
+    function getContentComponent(content) {
+        let component = null
+        switch (content) {
+            case 'ShopComponent': component = ShopComponent;
+                break;
+            case 'CategoryComponent': component = CategoryComponent;
+                break;
+            case 'FoodComponent': component = FoodComponent;
+                break;
+            default: component = null;
+                break;
+        }
+        return component
+    }
     return (
-        categoryFlag ? <Outlet></Outlet> : <Spin tip="Loading..." spinning={spinning}>
-            <Row align="middle" justify="center">
-                <Col span={20}>
-                    店铺列表
-                </Col>
-                <Col span={4}>
-                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditModalFlag({
-                        mainColor: defaultColor
-                    })}>新增店铺</Button>
-                </Col>
-            </Row>
-            <div>
+        <Tabs className='tabs-container' hideAdd onChange={onChange} activeKey={activeKey} type="editable-card" onEdit={onEdit} onTabClick={onTabClick}>
+            {panes.map(pane => (
+                <TabPane className='tab-pane-item' tab={pane.title} key={pane.key}>
+                    {getContentComponent(pane.info.componentName)}
+                </TabPane>
+            ))}
+        </Tabs>
+    );
+};
 
-            </div>
-
-            {/* <div className="home-title flex-row flex-a-center flex-j-between">
-                <div>店铺列表</div>
-                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={toAddShop}>新增店铺</Button>
-            </div> */}
-            <Table style={{ 'marginTop': '30px' }} columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.shopID} />
-            {/* {editModalFlag && <ShopEdit toCloseEditModal={toCloseEditModal} toUpdateShopList={toUpdateShopList} record={record} />} */}
-            {editModalFlag && <ShopEdit toCloseEditModal={(toCloseEditModal)} toUpdateShopList={toUpdateShopList} record={record} > </ShopEdit>}
-            {
-                <BatchImport visible={batchImportFlag} record={record} confirm={() => setBatchImportFlag(false)} cancel={() => setBatchImportFlag(false)}></BatchImport>
-            }
-        </Spin>
-    )
-}
-export default Shop
+export default App;

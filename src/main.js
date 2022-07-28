@@ -9,6 +9,7 @@ import Food from './pages/shop/category/food/index'
 import Spider from './pages/spider/index'
 import Login from './pages/login/index'
 import Register from './pages/register/index'
+
 import './style/common.css'
 import './style/flex.css'
 import './main.css'
@@ -22,18 +23,17 @@ export default class App extends React.Component {
             <BrowserRouter>
                 <Routes>
                     <Route path="/manage" element={<Menu></Menu>}>
+
                         <Route path='login' element={<Login></Login>}></Route>
                         <Route path='register' element={<Register></Register>}></Route>
                         <Route path='upload' element={<Upload></Upload>}></Route>
-                        <Route path='shop' element={<Shop></Shop>}>
-                            <Route path='category' element={<Category></Category>}>
-                                <Route path="food" element={<Food></Food>}></Route>
-                            </Route>
-                        </Route>
+                        <Route path='shop/*' element={<Shop></Shop>}></Route>
+                        {/* <Route path='category' element={<Category></Category>}></Route>
+                        <Route path="food" element={<Food></Food>}></Route> */}
                         {/* <Route path='order' element={<Shop></Shop>}>
                         </Route> */}
                     </Route>
-                    <Route path="*" element={<Navigate to='/manage/shop' replace></Navigate>} />
+                    {/* <Route path="*" element={<Navigate to='/manage/shop' replace></Navigate>} /> */}
                 </Routes>
             </BrowserRouter>
         )

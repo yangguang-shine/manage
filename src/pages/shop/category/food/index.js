@@ -10,27 +10,18 @@ import { foodImgPath } from '@/config/index'
 
 
 const Food = (props) => {
-    const navigate = useNavigate()
     const fetch = useFetch()
-    const [params] = useSearchParams()
-    let shopID = params.get('shopID')
-    let categoryID = params.get('categoryID')
-    let categoryName = params.get('categoryName')
-
+    console.log(props)
+    const {shopID, categoryID, categoryName} = props
     const [dataSource, setDatasource] = useState([])
     const [record, setRecord] = useState({})
     const [editModalFlag, setEditModalFlag] = useState(false)
     const [spinning, setSpinning] = useState(false)
-    const [testFlag, setTestFlag] = useState(false)
-    const location = useLocation()
-    let key = 0;
 
     useEffect(() => {
         // location.pathname.startsWith('/shop')
-         shopID = params.get('shopID')
-         categoryID = params.get('categoryID')
         init()
-    }, [location])
+    }, [])
     async function getFoodList() {
         const res = await fetch('/manage/food/list', {
             shopID,
@@ -111,10 +102,6 @@ const Food = (props) => {
             setSpinning(false)
         }
     }
-    function toShowTestFlag() {
-        setTestFlag(true)
-    }
-
 
     function onChange(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -162,7 +149,6 @@ const Food = (props) => {
                     <Space>
                         <Tag color="green" onClick={() => toShowEditModalFlag(record)}>编辑菜品</Tag>
                         <Tag color="red" onClick={() => removeFoodConfirmModal(record)}>删除菜品</Tag>
-                        <Tag color="red" onClick={() => toShowTestFlag(record)}>测试菜品</Tag>
                     </Space>
                 )
             }

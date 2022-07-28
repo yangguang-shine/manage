@@ -8,6 +8,42 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 
 // import { SubMenu, Item } from "rc-menu";
 const { SubMenu, Item } = Menu;
+const items = [
+    {
+        label: <Link to={"login"}>login</Link>,
+        key: 'login',
+    },
+    {
+        label: <Link to={"register"}>register</Link>,
+        key: 'register',
+    },
+    {
+        label: <Link to={"upload"}>upload</Link>,
+        key: 'upload',
+    },
+    {
+        label: 'sub_shop',
+        key: 'sub_shop',
+        children: [
+            {
+                label: <Link to={"shop"}>shop</Link>,
+                key: 'shop',
+            },
+            {
+                label: <Link to={"tab"}>tab</Link>,
+                key: 'tab',
+            },
+            // {
+            //     label: <Link to={"category"}>category</Link>,
+            //     key: 'category',
+            // },
+            // {
+            //     label: <Link to={"food"}>food</Link>,
+            //     key: 'food',
+            // },
+        ]
+    },
+]
 const { Header, Sider, Content } = Layout;
 const BaseLayout = props => {
     const rootSubMenuList = ['sub_shop', 'test']
@@ -17,21 +53,36 @@ const BaseLayout = props => {
     const [selectedKeys, setSelectedKeys] = useState([])
     useEffect(() => {
         console.log('>>>>>>>>>>>>>>>>')
-        if (location.pathname === '/manage') {
-            navigate('/shop', { replace: true })
-        }
-        if (location.pathname.startsWith('/manage/shop')) {
+        const pathname = location.pathname
+        console.log(pathname)
+        if (pathname.startsWith('/manage/shop/category/food')) {
             setOpenKeys(['sub_shop'])
-            setSelectedKeys(['/shop'])
-        } else {
-            console.log('location.pathname')
-            console.log(location.pathname)
-            setSelectedKeys([location.pathname.replace('/manage', '')])
-            // setOpenKeys(['sub_shop'])
-            // setSelectedKeys(['/shop'])
+            setSelectedKeys(['shop'])
+        } else if (pathname.startsWith('/manage/shop/category')) {
+            setOpenKeys(['sub_shop'])
+            setSelectedKeys(['shop'])
         }
-        // setSelectKeys([location.pathname])
-    }, [location])
+        else if (pathname.startsWith('/manage/shop')) {
+            setOpenKeys(['sub_shop'])
+            setSelectedKeys(['shop'])
+        } else if (pathname.startsWith('/manage/tab')) {
+            setOpenKeys(['sub_shop'])
+            setSelectedKeys(['tab'])
+        } else if (pathname.startsWith('/manage/login')) {
+            setOpenKeys([])
+            setSelectedKeys(['login'])
+        } else if (pathname.startsWith('/manage/register')) {
+            setOpenKeys([])
+            setSelectedKeys(['register'])
+        } else if (pathname.startsWith('/manage/upload')) {
+            setOpenKeys([])
+            setSelectedKeys(['upload'])
+        }
+        else {
+            console.log(pathname)
+            navigate('/manage/shop', { replace: true })
+        }
+    }, [])
     function onOpenChange(openKeys) {
         console.log('onOpenChange')
         const len = openKeys.length
@@ -41,16 +92,18 @@ const BaseLayout = props => {
             setOpenKeys([])
         }
     }
-    function onSelect({ selectedKeys }) {
-        console.log('onSelect')
-        setSelectedKeys(selectedKeys)
+    function onSelect({ item, key, keyPath, selectedKeys, domEvent }) {
+        console.log({ item, key, keyPath, selectedKeys, domEvent })
+        setSelectedKeys([key])
+        // setSelectedKeys([item.key])
+        // setSelectedKeys
     }
     return (
         <Layout className="layout-container">
             <Sider>
                 <div className="logo-tip">manage</div>
-                <Menu mode="inline" theme="dark" defaultOpenKeys={['sub_shop']} openKeys={openKeys} selectedKeys={selectedKeys} onOpenChange={onOpenChange} onSelect={onSelect}>
-                    <Item key="/login">
+                <Menu mode="inline" theme="dark" defaultOpenKeys={['sub_shop']} openKeys={openKeys} selectedKeys={selectedKeys} onOpenChange={onOpenChange} onSelect={onSelect} items={items}>
+                    {/* <Item key="login">
                         <Link to={"login"}>login</Link>
                     </Item>
                     <Item key="/register">
@@ -63,10 +116,11 @@ const BaseLayout = props => {
                         <Item key="/shop">
                             <Link to={"shop"}>shop</Link>
                         </Item>
-                        {/* <Item key="/order">
+                      
+                    </SubMenu> */}
+                    {/* <Item key="/order">
                             <Link to={"order"}>order</Link>
                         </Item> */}
-                    </SubMenu>
                     {/* <SubMenu key="test" title="Navigation One">
                         <Menu.Item key="test1">test1</Menu.Item>
                         <Menu.Item key="test2">test2</Menu.Item>

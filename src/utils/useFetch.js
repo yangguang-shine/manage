@@ -28,7 +28,7 @@ export default function useFetch() {
                 if (code === '000') {
                     resolve(data)
                 } else if (code === '200' && fetchOptions.autoLoginFlag) {
-                    navigate('/login', {
+                    navigate('/manage/login', {
                         replace: true
                     })
                     reject(msg)

@@ -1,6 +1,6 @@
 import React, { useState, Fragment, useEffect } from 'react';
 import { Table, Tag, Popconfirm, Spin, Modal, Row, Col, Button } from 'antd';
-import { PlusOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import useFetch from '@/utils/useFetch';
@@ -11,8 +11,7 @@ const Shop = (props) => {
     const navigate = useNavigate()
     const location = useLocation()
     const fetch = useFetch()
-    const [params] = useSearchParams()
-    let shopID = params.get('shopID')
+    const { shopID } = props
     const [showEditCategoryFlag, setShowEditCategoryFlag] = useState(false)
     const [showFoodListFlag, setShowFoodListFlag] = useState(false);
     const [spinning, setSpinning] = useState(false);
@@ -20,15 +19,8 @@ const Shop = (props) => {
     const [record, setRecord] = useState({});
     let key = 0
     useEffect(() => {
-        const pathname = location.pathname
-        shopID = params.get('shopID')
-        if (pathname === '/manage/shop/category') {
-            setShowFoodListFlag(false)
-            init()
-        } else if (pathname.startsWith('/manage/shop/category/food')) {
-            setShowFoodListFlag(true)
-        }
-    }, [location]);
+        init()
+    }, []);
     async function init() {
         try {
             setSpinning(true)
@@ -95,16 +87,16 @@ const Shop = (props) => {
     }
     async function toRemoveCategory(categoryIDList) {
         try {
-           setSpinning(true)
-           await fetch('/manage/category/remove', {
-               shopID,
-               categoryIDList
-           })
-           init()
-        } catch(e) {
-           console.log(e)
+            setSpinning(true)
+            await fetch('/manage/category/remove', {
+                shopID,
+                categoryIDList
+            })
+            init()
+        } catch (e) {
+            console.log(e)
         } finally {
-           setSpinning(false)
+            setSpinning(false)
 
         }
     }
@@ -121,9 +113,9 @@ const Shop = (props) => {
             render: (text, record, index) => {
                 return (
                     <Fragment>
-                        <Tag color="cyan" onClick={() => toFoodList(record)}>查看菜品</Tag>
+                        <Tag color="cyan" onClick={() => props.toFoodList(record)}>查看菜品</Tag>
                         <Tag color="green" onClick={() => toShowEditCategory(record)}>编辑分类</Tag>
-                            <Tag color="red" onClick={() => removeCategoryConfirmModal(record)}>删除分类</Tag>
+                        <Tag color="red" onClick={() => removeCategoryConfirmModal(record)}>删除分类</Tag>
                     </Fragment>
 
                 )
@@ -144,25 +136,24 @@ const Shop = (props) => {
 
 
 
-    return showFoodListFlag ? <Outlet></Outlet> :
-        <Spin spinning={spinning}>
-            <Row align="middle" justify="center">
-                <Col span={16}>
-                    店铺分类列表
-                </Col>
-                <Col span={4}>
-                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditCategory({})}>新增分类</Button>
-              
+    return <Spin spinning={spinning}>
+        <Row align="middle" justify="center">
+            <Col span={16}>
+                店铺分类列表
+            </Col>
+            <Col span={4}>
+                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => toShowEditCategory({})}>新增分类</Button>
 
-                </Col>
-                <Col span={4}>
-                    <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => removeAllCategoryConfirmModal({})}>删除全部分类</Button>
-                </Col>
-            </Row>
-            <Table columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.categoryID}/>
-            {
-                showEditCategoryFlag ? <CategoryEdit toCloseEditModal={toCloseEditModal} toUpdateCategoryList={toUpdateCategoryList} record={record}></CategoryEdit> : null
-            }
-        </Spin>
+
+            </Col>
+            <Col span={4}>
+                <Button icon={<PlusOutlined />} type="primary" size="large" onClick={() => removeAllCategoryConfirmModal({})}>删除全部分类</Button>
+            </Col>
+        </Row>
+        <Table columns={columns} dataSource={dataSource} onChange={onChange} rowKey={(record) => record.categoryID} />
+        {
+            showEditCategoryFlag ? <CategoryEdit toCloseEditModal={toCloseEditModal} toUpdateCategoryList={toUpdateCategoryList} record={record}></CategoryEdit> : null
+        }
+    </Spin>
 }
 export default Shop
